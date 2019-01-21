@@ -1,0 +1,22 @@
+{
+  "name": "tankbattle",
+  "version": "1.0.0",
+  "description": "An online multiplayer tank battle game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tbreimer/tankBattle.git"
+  },
+  "keywords": [
+    "tank"
+  ],
+  "author": "Thomas Breimer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tbreimer/tankBattle/issues"
+  },
+  "homepage": "https://github.com/tbreimer/tankBattle#readme"
+}
