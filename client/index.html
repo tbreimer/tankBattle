@@ -3,14 +3,20 @@
     <title>Tank Battle</title>
     <style>
       canvas {
-        width: 800px;
-        height: 600px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
       }
     </style>
     <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <body onload="init()">
+    <canvas id="bgLayer" width="1280" height="720"></canvas>
+    <canvas id="playerLayer" width="1280" height="720"></canvas>
+    <canvas id="uiLayer" width="1280" height="720" onmousemove="getMousePos(event)" onmousedown="mouseDown(event)" onmouseup="mouseUp(event)">
   </body>
-  <script src="/client/game.js"></script>
+  <script src="/client/js/ui.js"></script>
+  <script src="/client/js/title.js"></script>
+  <script src="/client/js/game.js"></script>
 </html>
