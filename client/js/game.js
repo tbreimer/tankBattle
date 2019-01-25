@@ -55,6 +55,8 @@ mode = 0;
 
 window.addEventListener('resize', resize);
 
+document.body.addEventListener('touchstart', function(e){ e.preventDefault(); });
+
 function resize(){
   // Get window size
   windowWidth = window.innerWidth || document.body.clientWidth;
