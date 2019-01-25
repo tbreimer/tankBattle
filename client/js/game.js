@@ -16,7 +16,7 @@ function makeid() {
 
 colors = ["green", "blue", "purple", "red", "yellow", "orange", "violet", "brown"];
 
-username = prompt("Enter your username"); //makeID();
+username = prompt("Enter your username"); //makeid();
 color = colors[Math.floor(Math.random() * colors.length)];; //prompt("Enter your color")
 
 /*

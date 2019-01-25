@@ -94,10 +94,28 @@ function UI(){
       case 0:
         this.lobby();
         break;
+      case 1:
+        this.quitButton();
     }
 
     this.press = false;
     this.click = false;
+  }
+
+  UI.prototype.quitButton = function(){
+    quitText = "Quit";
+    quitX = 20;
+    quitY = 20;
+    quitHeight = 40;
+    quitWidth = 60;
+    clicked = button(quitX, quitY, quitWidth, quitHeight, quitText, 26, 20, false);
+
+    if (clicked == true){
+      pCtx.clearRect(0, 0, windowWidth, windowHeight);
+      mode = 0;
+      socket.emit('leave');
+    }
+
   }
 
   UI.prototype.lobby = function(){

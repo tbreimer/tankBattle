@@ -29,6 +29,12 @@ function Game(){
   // 0: Lobby 1: In Game
   this.mode = 0;
   this.players = {};
+
+  Game.prototype.update = function(){
+    if (Object.keys(game.players).length == 0){
+      this.mode = 0;
+    }
+  }
 }
 
 function communication(socket){
@@ -116,5 +122,6 @@ io.on('connection', function(socket) {communication(socket)});
 
 setInterval(function() {
   io.sockets.emit('state', game);
+  game.update();
 }, 1000 / 60);
 
