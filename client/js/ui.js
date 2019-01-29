@@ -87,35 +87,196 @@ function UI(){
   this.press = false;
   this.click = false;
 
+  this.diedScreenUp = false;
+  this.pauseScreenUp = false;
+
   UI.prototype.update = function(){
     uCtx.clearRect(0, 0, windowWidth, windowHeight);
+
+    // Gets the block coordinates of the mouse
+    canvasTopx = player.x - ((windowWidth / 2)); 
+    canvasTopy = player.y - ((windowHeight / 2)); 
+
+    // Get the world coordinates of the mouse
+    this.mouseWx = Math.floor(canvasTopx + this.mouseX);
+    this.mouseWy = Math.floor(canvasTopy + this.mouseY);
 
     switch (world.mode){
       case 0:
         this.lobby();
         break;
       case 1:
-        this.quitButton();
+        this.pauseButton();
+
+        if (player.type == 'spectator'){
+          this.spectating();
+        }
+
+        if (this.pauseScreenUp == true){
+          this.pauseScreen();
+        }
+
+        if (this.diedScreenUp == true){
+          this.diedScreen();
+        }
+
+        break;
     }
+
+
 
     this.press = false;
     this.click = false;
   }
 
-  UI.prototype.quitButton = function(){
-    quitText = "Quit";
-    quitX = 20;
-    quitY = 20;
-    quitHeight = 40;
-    quitWidth = 60;
-    clicked = button(quitX, quitY, quitWidth, quitHeight, quitText, 26, 20, false);
+  UI.prototype.pauseButton = function(){
+    menuText = "Menu";
+    menuX = 20;
+    menuY = 20;
+    menuHeight = 40;
+    menuWidth = 60;
+    clicked = button(menuX, menuY, menuWidth, menuHeight, menuText, 26, 20, false);
 
     if (clicked == true){
-      pCtx.clearRect(0, 0, windowWidth, windowHeight);
-      mode = 0;
-      socket.emit('leave');
+      if (this.pauseScreenUp == true){
+        this.pauseScreenUp = false;
+      }else{
+        this.pauseScreenUp = true;
+      }
+      
+    }
+  }
+
+  UI.prototype.pauseScreen = function(){
+    // Background
+    bgWidth = windowWidth / 2;
+    bgHeight = windowHeight * 0.8;
+
+    bgX = (windowWidth / 2) - (bgWidth / 2);
+    bgY = (windowHeight / 2) - (bgHeight / 2);
+
+    uCtx.strokeStyle = "rgb(50, 50, 50)";
+    uCtx.lineWidth = 2;
+
+    uCtx.fillStyle = "rgb(230, 230, 230)";
+    uCtx.fillRect(bgX, bgY, bgWidth, bgHeight);
+    uCtx.strokeRect(bgX, bgY, bgWidth, bgHeight);
+
+    // ----------- Close Button
+    closeX = bgX + 30;
+    closeY = bgY + 30;
+    closeWidth = 20;
+    closeHeight = 20;
+    closeRadius = 17;
+
+    dist = findDistance(ui.mouseX - (closeX + (closeWidth / 2)), ui.mouseY - (closeY + (closeHeight / 2)))
+    
+    // If button is hovered on and clicked
+    if (dist < closeRadius){
+      uCtx.fillStyle = "rgb(170, 170, 170)";
+      uCtx.beginPath();
+      uCtx.arc(closeX + (closeWidth / 2), closeY + (closeHeight / 2), closeRadius, 0, 2 * Math.PI);
+      uCtx.fill();
+
+      if (ui.click == true){
+        this.pauseScreenUp = false;
+      }
     }
 
+    uCtx.beginPath();
+    uCtx.moveTo(closeX, closeY);
+    uCtx.lineTo(closeX + closeWidth, closeY + closeHeight);
+    uCtx.stroke();
+
+    uCtx.beginPath();
+    uCtx.moveTo(closeX + closeWidth, closeY);
+    uCtx.lineTo(closeX, closeY + closeHeight);
+    uCtx.stroke();
+
+    quitText = "Quit";
+    quitHeight = 40;
+    quitWidth = 60;
+    quitX = (windowWidth / 2) - (quitWidth / 2);
+    quitY = bgY + bgHeight - 80;
+    clicked = button(quitX, quitY, quitWidth, quitHeight, quitText, 26, 20, false);
+    
+    if (clicked == true){
+      pCtx.clearRect(0, 0, windowWidth, windowHeight);
+
+      mode = 0;
+
+      socket.emit('leave');
+
+      this.pauseScreenUp = false;
+    }
+    
+  }
+
+  UI.prototype.diedScreen = function(){
+    // Background
+    bgWidth = windowWidth / 2;
+    bgHeight = windowHeight * 0.8;
+
+    bgX = (windowWidth / 2) - (bgWidth / 2);
+    bgY = (windowHeight / 2) - (bgHeight / 2);
+
+    uCtx.strokeStyle = "rgb(50, 50, 50)";
+    uCtx.lineWidth = 2;
+
+    uCtx.fillStyle = "rgb(230, 230, 230)";
+    uCtx.fillRect(bgX, bgY, bgWidth, bgHeight);
+    uCtx.strokeRect(bgX, bgY, bgWidth, bgHeight);
+
+    // Quit Button
+    quitText = "Quit";
+    quitHeight = 40;
+    quitWidth = 120;
+    quitX = (windowWidth / 2) - (quitWidth / 2);
+    quitY = bgY + bgHeight - 80;
+    clicked = button(quitX, quitY, quitWidth, quitHeight, quitText, 26, 20, false);
+    
+    if (clicked == true){
+      pCtx.clearRect(0, 0, windowWidth, windowHeight);
+
+      mode = 0;
+
+      socket.emit('leave');
+
+      this.diedScreenUp = false;
+    }
+
+    // Spectate Button
+    spectateText = "Spectate";
+    spectateHeight = 40;
+    spectateWidth = 120;
+    spectateX = (windowWidth / 2) - (quitWidth / 2);
+    spectateY = bgY + bgHeight - 130;
+    clicked = button(spectateX, spectateY, spectateWidth, spectateHeight, spectateText, 26, 20, false);
+    
+    if (clicked == true){
+      this.diedScreenUp = false;
+    }
+
+    // You Died!
+    uCtx.font = "60px Arial";
+    ydText = "You Died!";
+    ydWidth = uCtx.measureText(ydText).width;
+    ydX = Math.floor(windowWidth / 2 - ydWidth / 2);
+    ydY = windowHeight * 0.5;
+
+    uCtx.fillStyle = "rgb(50, 50, 50)";
+    uCtx.fillText(ydText, ydX, ydY);
+  }
+
+  UI.prototype.spectating = function(){
+    uCtx.font = "40px Arial";
+    spectateText = "Spectating";
+    spectateWidth = uCtx.measureText(spectateText).width;
+    spectateX = Math.floor(windowWidth / 2 - spectateWidth / 2);
+    spectateY = windowHeight * 0.2;
+
+    uCtx.fillStyle = "rgb(50, 50, 50)";
+    uCtx.fillText(spectateText, spectateX, spectateY);
   }
 
   UI.prototype.lobby = function(){

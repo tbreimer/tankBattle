@@ -25,16 +25,107 @@ setInterval(function() {
 
 game = new Game();
 
+// Variables to calculate fps
+var fps;
+var frame = 0;
+
+function init(){
+  setInterval(everySecond, 1000);
+  setInterval(function() { update(); }, 1000 / 60);
+}
+
+function update(){ 
+  frame += 1;
+
+  io.sockets.emit('state', game);
+  game.update();
+}
+
+// Every second this method is executed
+function everySecond(){
+  // Calculate fps
+  fps = frame;
+  frame = 0;
+}
+
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min) ) + min;
+}
+
 function Game(){
-  // 0: Lobby 1: In Game
+  // 0: Lobby 1: In Game 2: End Game Screen
+
   this.mode = 0;
+  
   this.players = {};
+  this.bullets = [];
 
   Game.prototype.update = function(){
+
+
     if (Object.keys(game.players).length == 0){
       this.mode = 0;
     }
+    
+    if (this.mode == 1){
+      this.checkEndGame();
+    }
+
+    this.updateBullets();
   }
+
+  Game.prototype.updateBullets = function(){
+    for (var x = 0; x < this.bullets.length; x++){
+      bullet = this.bullets[x];
+
+      bullet.x += bullet.cX;
+      bullet.y += bullet.cY;
+    }
+  }
+
+  Game.prototype.start = function(){
+    game.mode = 1;
+
+    for (var id in game.players) {
+      user = game.players[id];
+      io.to(id).emit('change position', random(0, 600), random(0, 600));
+      user.type = 'playing';
+    }
+  }
+
+  Game.prototype.checkEndGame = function(){
+    number = 0;
+
+    for (var id in game.players) {
+      user = game.players[id];
+      
+      if (user.type == 'playing'){
+        number += 1;
+        name = user.username;
+      }
+    }
+
+    if (number < 2){
+      setTimeout(function(){ game.reset(); }, 3000);
+    }
+  }
+
+  Game.prototype.reset = function(){
+    game.mode = 0;
+  }
+}
+
+function Bullet(x, y, targetX, targetY, rotation, cX, cY, owner){
+  this.x = x;
+  this.y = y;
+  this.targetX = targetX;
+  this.targetY = targetY;
+  this.rotation = rotation;
+  this.cX = cX;
+  this.cY = cY;
+  this.width = 10;
+  this.height = 12;
+  this.owner = owner;
 }
 
 function communication(socket){
@@ -48,10 +139,17 @@ function communication(socket){
       playerHosts = false;
     }
 
+    if (game.mode == 0){
+      type = 'lobby';
+    }else if (game.mode == 1){
+      type = 'spectator';
+    }
+
     game.players[socket.id] = {
       username: player.username,
       color: player.color,
-      host: playerHosts
+      host: playerHosts,
+      type: type
     };
   });
 
@@ -98,13 +196,27 @@ function communication(socket){
   });
 
   socket.on('start game', function(){
-    game.mode = 1;
+    game.start();
+  });
+
+  socket.on('bullet hit', function(id){
+    game.bullets.splice(id);
+  });
+
+  socket.on('player died', function(socketID){
+    game.players[socketID].type = 'spectator';
   });
 
   socket.on('player data', function(data) {
     var player = game.players[socket.id] || {};
     player.x = data.x;
     player.y = data.y;
+    player.rotation = data.rotation;
+    player.health = data.health
+  });
+
+  socket.on('fire', function(x, y, endX, endY, rotation, cX, cY, owner) {
+    game.bullets.push(new Bullet(x, y, endX, endY, rotation, cX, cY, owner));
   });
 
   socket.on('change host', function() {
@@ -120,8 +232,5 @@ function communication(socket){
 
 io.on('connection', function(socket) {communication(socket)});
 
-setInterval(function() {
-  io.sockets.emit('state', game);
-  game.update();
-}, 1000 / 60);
+init();
 
