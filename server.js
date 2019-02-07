@@ -60,8 +60,9 @@ function Game(){
   this.players = {};
   this.bullets = [];
 
-  Game.prototype.update = function(){
+  this.winner; // Username of who won the last game
 
+  Game.prototype.update = function(){
 
     if (Object.keys(game.players).length == 0){
       this.mode = 0;
@@ -106,11 +107,19 @@ function Game(){
     }
 
     if (number < 2){
+      game.winner = name;
+      game.mode = 2;
       setTimeout(function(){ game.reset(); }, 3000);
     }
   }
 
   Game.prototype.reset = function(){
+    io.sockets.emit("reset");
+
+    for (var id in game.players) {
+      game.players[id].type = "lobby";
+    }
+
     game.mode = 0;
   }
 }

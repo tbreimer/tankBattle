@@ -119,8 +119,24 @@ function UI(){
         if (this.diedScreenUp == true){
           this.diedScreen();
         }
-
         break;
+      case 2:
+        this.pauseButton();
+        
+
+        if (player.type == 'spectator'){
+          this.spectating();
+        }
+
+        if (this.pauseScreenUp == true){
+          this.pauseScreen();
+        }
+
+        if (this.diedScreenUp == true){
+          this.diedScreen();
+        }
+
+        this.winScreen();
     }
 
 
@@ -210,6 +226,37 @@ function UI(){
       this.pauseScreenUp = false;
     }
     
+  }
+
+  UI.prototype.winScreen = function(){
+    // Background
+    bgWidth = windowWidth / 2;
+    bgHeight = windowHeight * 0.8;
+
+    bgX = (windowWidth / 2) - (bgWidth / 2);
+    bgY = (windowHeight / 2) - (bgHeight / 2);
+
+    uCtx.strokeStyle = "rgb(50, 50, 50)";
+    uCtx.lineWidth = 2;
+
+    uCtx.fillStyle = "rgb(230, 230, 230)";
+    uCtx.fillRect(bgX, bgY, bgWidth, bgHeight);
+    uCtx.strokeRect(bgX, bgY, bgWidth, bgHeight);
+
+    // Player Won!
+    if (player.alive == true){
+      winText = "You Won!"
+    }else{
+      winText = world.winner + " Won!"
+    }
+
+    uCtx.font = "40px Arial";
+    winWidth = uCtx.measureText(winText).width;
+    winX = Math.floor(windowWidth / 2 - winWidth / 2);
+    winY = windowHeight * 0.5;
+
+    uCtx.fillStyle = "rgb(50, 50, 50)";
+    uCtx.fillText(winText, winX, winY);
   }
 
   UI.prototype.diedScreen = function(){

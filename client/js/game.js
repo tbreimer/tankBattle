@@ -1,3 +1,16 @@
+
+// ******************************************************
+// DONE FEATURES 
+// v1.2-alpha
+// - Menu
+// - Death Screen
+// - Win Screen
+
+// PLANNED FEAUTRES
+// v2.0-alpha
+// - Bullet Collision in Server
+// ******************************************************
+
 var socket = io();
 socket.on('message', function(data) {
   console.log(data);
@@ -17,14 +30,7 @@ function makeid() {
 colors = ["green", "blue", "purple", "red", "orange", "violet", "brown"];
 
 username = prompt("Username");
-color = colors[Math.floor(Math.random() * colors.length)];; //prompt("Enter your color")
-
-/*
-socket.emit('new player', username, color);
-setInterval(function() {
-  socket.emit('movement', movement);
-}, 1000 / 60);
-*/
+color = prompt("Enter your color");
 
 // Canvas
 var bCanvas = document.getElementById('bgLayer');
@@ -75,6 +81,8 @@ function init(){
 }
 
 function update(){
+  pCtx.clearRect(0, 0, windowWidth, windowHeight);
+
   switch (mode){
     case 0:
       title.update();
@@ -93,6 +101,7 @@ function update(){
 function updateGame(data){
   world.players = data.players;
   world.mode = data.mode;
+  world.winner = data.winner;
 
   for (var id in world.players) {
     if (id == player.socketID){
@@ -174,10 +183,8 @@ function World(){
   this.bulletDamage = 10;
 
   World.prototype.update = function(){
-    pCtx.clearRect(0, 0, windowWidth, windowHeight);
 
-
-    if (this.mode == 1){
+    if (this.mode == 1 || this.mode == 2){
         for (var id in this.players) {
           var user = this.players[id];
  
@@ -237,10 +244,11 @@ function Player(){
 
   this.bulletSpeed = 10;
 
+  this.dead = false;
+
   this.host;
 
   Player.prototype.update = function(){
-
 
     if (this.type == 'playing'){
 
@@ -255,7 +263,6 @@ function Player(){
         }
 
         movement = calcAngleCoords(this.rotation, this.speed);
-
 
         if (this.movement.up == true){
           this.x -= movement.x;
@@ -309,6 +316,7 @@ function Player(){
   }
 
   Player.prototype.bulletCollision = function(){
+
     for (var x = 0; x < world.bullets.length; x ++){
       bullet = world.bullets[x];
 
@@ -381,6 +389,13 @@ function Player(){
     this.x = x;
     this.y = y;
   }
+
+  Player.prototype.reset = function(){
+    this.health = 30;
+    this.maxHealth = 30;
+    this.dead = false;
+    ui.diedScreenUp = false;
+  }
 }
 
 socket.on('state', function(data) {
@@ -406,10 +421,14 @@ socket.on('change position', function(x, y) {
   player.changePosition(x, y);
 })
 
+socket.on('reset', function() {
+  player.reset();
+});
+
 socket.on('get kicked', function(){
   console.log("Uh oh")
   window.location.replace("http://forestquest.net/kicked/kicked.html");
-})
+});
 
 function keyDown(evt){
   evt.preventDefault();
