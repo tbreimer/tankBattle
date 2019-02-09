@@ -93,14 +93,6 @@ function UI(){
   UI.prototype.update = function(){
     uCtx.clearRect(0, 0, windowWidth, windowHeight);
 
-    // Gets the block coordinates of the mouse
-    canvasTopx = player.x - ((windowWidth / 2)); 
-    canvasTopy = player.y - ((windowHeight / 2)); 
-
-    // Get the world coordinates of the mouse
-    this.mouseWx = Math.floor(canvasTopx + this.mouseX);
-    this.mouseWy = Math.floor(canvasTopy + this.mouseY);
-
     switch (world.mode){
       case 0:
         this.lobby();
@@ -138,8 +130,6 @@ function UI(){
 
         this.winScreen();
     }
-
-
 
     this.press = false;
     this.click = false;
@@ -244,7 +234,7 @@ function UI(){
     uCtx.strokeRect(bgX, bgY, bgWidth, bgHeight);
 
     // Player Won!
-    if (player.alive == true){
+    if (player.dead == false){
       winText = "You Won!"
     }else{
       winText = world.winner + " Won!"

@@ -9,6 +9,11 @@
 // PLANNED FEAUTRES
 // v2.0-alpha
 // - Bullet Collision in Server
+// - Revert Back to Absolute Postion
+
+// BUGS
+// - Bullets dissapear if rapid fired
+// - Bullets don't do proper amount of damage
 // ******************************************************
 
 var socket = io();
@@ -29,8 +34,8 @@ function makeid() {
 
 colors = ["green", "blue", "purple", "red", "orange", "violet", "brown"];
 
-username = prompt("Username");
-color = prompt("Enter your color");
+username = makeid(); //prompt("Username");
+color = colors[Math.floor(Math.random() * colors.length)];//prompt("Enter your color");
 
 // Canvas
 var bCanvas = document.getElementById('bgLayer');
@@ -189,8 +194,8 @@ function World(){
           var user = this.players[id];
  
           if (user.type == 'playing' && id != player.socketID){
-            screenX = user.x - player.x + (windowWidth / 2);
-            screenY = user.y - player.y + (windowHeight / 2);
+            screenX = user.x;
+            screenY = user.y;
 
             pCtx.fillStyle = user.color;
             drawRectRot(pCtx, screenX , screenY, player.width, player.height, user.rotation);
@@ -204,8 +209,8 @@ function World(){
       for (var x = 0; x < this.bullets.length; x++){
         bullet = this.bullets[x];
 
-        screenX = bullet.x - player.x + (windowWidth / 2);
-        screenY = bullet.y - player.y + (windowHeight / 2);
+        screenX = bullet.x;
+        screenY = bullet.y;
 
         pCtx.fillStyle = "gray";
 
@@ -223,8 +228,8 @@ function Player(){
   this.socketID = null;
   this.username = username;
   this.color = color;
-  this.x = 100;
-  this.y = 100;
+  this.x;
+  this.y;
   this.speed = 3;
 
   this.rotation = 0;
@@ -286,59 +291,19 @@ function Player(){
         if (ui.click == true){
           this.fire();
         }
-
-        this.bulletCollision();
       }
 
       socket.emit('player data', player);
 
       this.render();
 
-    }else if(this.type == 'spectator'){
-      if (this.movement.up == true){
-        this.y -= this.speed;
-      }
-
-      if (this.movement.down == true){
-        this.y += this.speed;
-      }
-
-      if (this.movement.left == true){
-        this.x -= this.speed;
-      }
-
-      if (this.movement.right == true){
-        this.x += this.speed;
-      }
-    }
-
-    
-  }
-
-  Player.prototype.bulletCollision = function(){
-
-    for (var x = 0; x < world.bullets.length; x ++){
-      bullet = world.bullets[x];
-
-      // If player did not fire bullet and the bullet didn't already damage the player
-      if (bullet.owner != this.socketID && bullet.alreadyDamaged != true){
-
-        if (bullet.x >= this.x && bullet.x <= this.x + this.width){
-          if (bullet.y >= this.y && bullet.y <= this.y + this.height){
-
-            world.bullets.splice(x);
-            this.damage(world.bulletDamage);
-            socket.emit('bullet hit', x);
-          }
-        }
-      }
     }
   }
 
   Player.prototype.render = function(){
     // Draw Player
-    screenX = (windowWidth / 2) - (this.width / 2);
-    screenY = (windowHeight / 2) - (this.height / 2);
+    screenX = this.x;
+    screenY = this.y;
 
     pCtx.fillStyle = this.color;
     drawRectRot(pCtx, screenX , screenY, this.width, this.height, this.rotation)
@@ -351,8 +316,8 @@ function Player(){
     cX = 0;
     cY = 0;
 
-    targetX = ui.mouseWx;
-    targetY = ui.mouseWy;
+    targetX = ui.mouseX;
+    targetY = ui.mouseY;
     
     // Finds how many pixels arrow has to travel in X axis for every pixel in Y axis
     cX = (this.x - targetX) / (this.y - targetY); // Change (x / y)
@@ -379,7 +344,7 @@ function Player(){
     this.health -= amount;
 
     if (this.health <= 0){
-      this.dead == true;
+      this.dead = true;
       ui.diedScreenUp = true;
       socket.emit("player died", this.socketID);
     }
@@ -419,7 +384,11 @@ socket.on('connect', function() {
 
 socket.on('change position', function(x, y) {
   player.changePosition(x, y);
-})
+});
+
+socket.on('hit by bullet', function(){
+  player.damage(10);
+});
 
 socket.on('reset', function() {
   player.reset();

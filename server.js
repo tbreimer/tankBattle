@@ -81,6 +81,19 @@ function Game(){
 
       bullet.x += bullet.cX;
       bullet.y += bullet.cY;
+
+      for (var id in game.players) {
+        user = game.players[id];
+        
+        if (bullet.owner != id){
+          if (bullet.x >= user.x && bullet.x <= user.x + user.width){
+            if (bullet.y >= user.y && bullet.y <= user.y + user.height){
+              io.to(id).emit('hit by bullet');
+              this.bullets.splice(x, 1);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -115,6 +128,8 @@ function Game(){
 
   Game.prototype.reset = function(){
     io.sockets.emit("reset");
+
+    this.bullets = [];
 
     for (var id in game.players) {
       game.players[id].type = "lobby";
@@ -208,10 +223,6 @@ function communication(socket){
     game.start();
   });
 
-  socket.on('bullet hit', function(id){
-    game.bullets.splice(id);
-  });
-
   socket.on('player died', function(socketID){
     game.players[socketID].type = 'spectator';
   });
@@ -221,7 +232,9 @@ function communication(socket){
     player.x = data.x;
     player.y = data.y;
     player.rotation = data.rotation;
-    player.health = data.health
+    player.health = data.health;
+    player.width = data.width;
+    player.height = data.height;
   });
 
   socket.on('fire', function(x, y, endX, endY, rotation, cX, cY, owner) {
