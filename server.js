@@ -19,7 +19,7 @@ server.listen(process.env.PORT || 5000, function() {
 
 game = new Game();
 
-var devMode = true;
+var devMode = false;
 
 // Variables to calculate fps
 var fps;

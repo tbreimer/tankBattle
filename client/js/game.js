@@ -3,7 +3,7 @@ socket.on('message', function(data) {
   console.log(data);
 });
 
-devMode = true;
+devMode = false;
 
 function makeid() {
   var text = "";
@@ -285,6 +285,7 @@ function World(){
           }
       }
 
+      /*
       map = this.maps.index[this.mapIndex];
 
       for (var x = 0; x < map.walls.length; x++){
@@ -300,6 +301,7 @@ function World(){
         bCtx.strokeRect(coords.x, coords.y, coords.width, coords.height);
 
       }
+      */
 
       for (var x = 0; x < this.bullets.length; x++){
         bullet = this.bullets[x];
