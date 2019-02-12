@@ -17,13 +17,9 @@ server.listen(process.env.PORT || 5000, function() {
   console.log('Starting server on port 5000');
 });
 
-/*
-setInterval(function() {
-  io.sockets.emit('message', 'hi!');
-}, 1000);
-*/
-
 game = new Game();
+
+var devMode = true;
 
 // Variables to calculate fps
 var fps;
@@ -64,11 +60,15 @@ function Game(){
 
   Game.prototype.update = function(){
 
-    if (Object.keys(game.players).length == 0){
+    if (Object.keys(game.players).length == 0 && devMode == false){
       this.mode = 0;
     }
+
+    if (devMode == true){
+      this.mode = 1;
+    }
     
-    if (this.mode == 1){
+    if (this.mode == 1 && devMode == false){
       this.checkEndGame();
     }
 
@@ -109,9 +109,11 @@ function Game(){
 
   Game.prototype.checkEndGame = function(){
     number = 0;
+    name = "";
 
     for (var id in game.players) {
       user = game.players[id];
+
       
       if (user.type == 'playing'){
         number += 1;
@@ -167,6 +169,12 @@ function communication(socket){
       type = 'lobby';
     }else if (game.mode == 1){
       type = 'spectator';
+    }
+
+    // Ensures new players automatically start playing in devMode
+    if (devMode == true){
+      type = 'playing';
+      io.to(socket.id).emit('change position', random(0, 600), random(0, 600));
     }
 
     game.players[socket.id] = {
@@ -229,10 +237,15 @@ function communication(socket){
 
   socket.on('player data', function(data) {
     var player = game.players[socket.id] || {};
+
     player.x = data.x;
     player.y = data.y;
+
     player.rotation = data.rotation;
+    player.turretRot = data.turretRot;
+
     player.health = data.health;
+
     player.width = data.width;
     player.height = data.height;
   });

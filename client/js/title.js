@@ -34,8 +34,7 @@ function Title(){
     clicked = button(0, poY, poWidth, poHeight, poText, 26, 20, true);
 
     if (clicked == true){
-      socket.emit('new player', player);
-      mode = 1;
+      world.join();
     }
   }
 }
