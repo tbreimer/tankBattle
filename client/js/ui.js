@@ -90,8 +90,15 @@ function UI(){
   this.diedScreenUp = false;
   this.pauseScreenUp = false;
 
+  this.mouseWx;
+  this.mouseWy;
+
   UI.prototype.update = function(){
     uCtx.clearRect(0, 0, windowWidth, windowHeight);
+
+    // Get the world coordinates of the mouse
+    this.mouseWx = Math.floor(world.canvasTopX + this.mouseX);
+    this.mouseWy = Math.floor(world.canvasTopY + this.mouseY);
 
     switch (world.mode){
       case 0:
@@ -111,6 +118,11 @@ function UI(){
         if (this.diedScreenUp == true){
           this.diedScreen();
         }
+
+        if (devMode == true){
+          this.debugScreen();
+        }
+
         break;
       case 2:
         this.pauseButton();
@@ -133,6 +145,22 @@ function UI(){
 
     this.press = false;
     this.click = false;
+  }
+
+  UI.prototype.debugScreen = function(){
+    uCtx.fillStyle = "black";
+    uCtx.font = this.textSize + "px Arial";
+
+    // Difference in y value between elements
+    space = 20;
+
+    y = windowHeight - 70;
+
+    x = 10;
+
+    uCtx.fillText("FPS " + fps, x, y);
+    uCtx.fillText("X " + Math.floor(player.x) + ", sX " + player.screenX + ", mX " + this.mouseWx + ", mSx " + this.mouseX, x, y + (space * 1));
+    uCtx.fillText("Y " + Math.floor(player.y) + ", sY " + player.screenY + ", mY" + this.mouseWy + ", mSy " + this.mouseY, x, y + (space * 2));
   }
 
   UI.prototype.pauseButton = function(){

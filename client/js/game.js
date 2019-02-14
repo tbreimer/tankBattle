@@ -51,6 +51,10 @@ var player = new Player();
 windowWidth = 1280;
 windowHeight = 720;
 
+// Variables to calculate fps
+var fps;
+var frame = 0;
+
 // 0: Title Screen 1: In Game
 mode = 0;
 
@@ -75,14 +79,28 @@ function resize(){
   uCanvas.height = windowHeight;
 }
 
+// Every second this method is executed
+function everySecond(){
+  // Calculate fps
+  fps = frame;
+  frame = 0;
+}
+
+setInterval(everySecond, 1000);
+
 function init(){
   resize();
   update();
 }
 
 function update(){
+  frame += 1;
+
   pCtx.clearRect(0, 0, windowWidth, windowHeight);
   bCtx.clearRect(0, 0, windowWidth, windowHeight);
+
+  windowWidth = window.innerWidth || document.body.clientWidth;
+  windowHeight =  window.innerHeight || document.body.clientHeight;
 
   switch (mode){
     case 0:
@@ -228,19 +246,19 @@ function calcAngleCoords(deg, speed){
   return {x: x, y: y};
 }
 
-function getScaledCoords(x, y, width, height){
-  map = world.maps.index[world.mapIndex];
+function rotatePoint(pivot, point, angle) {
+  // Converts degrees to radians
+  angle = angle * Math.PI / 180;
 
-  xFactor = windowWidth / map.width;
-  yFactor = windowHeight / map.height;
-
-  return {
-    x: Math.floor(x * xFactor),
-    y: Math.floor(y * yFactor),
-    width: Math.floor(width * xFactor),
-    height: Math.floor(height * yFactor)
-  };
-}
+  // Rotate clockwise, angle in radians
+  var x = Math.round((Math.cos(angle) * (point[0] - pivot[0])) -
+                     (Math.sin(angle) * (point[1] - pivot[1])) +
+                     pivot[0]),
+      y = Math.round((Math.sin(angle) * (point[0] - pivot[0])) +
+                     (Math.cos(angle) * (point[1] - pivot[1])) +
+                     pivot[1]);
+  return {x: x, y: y};
+};
 
 
 function World(){
@@ -257,13 +275,16 @@ function World(){
 
   World.prototype.update = function(){
 
+    this.canvasTopX = player.x - ((windowWidth / 2));
+    this.canvasTopY = player.y - ((windowHeight / 2));
+
     if (this.mode == 1 || this.mode == 2){
         for (var id in this.players) {
           var user = this.players[id];
  
           if (user.type == 'playing' && id != player.socketID){
-            screenX = user.x;
-            screenY = user.y;
+            screenX = user.x - player.x + (windowWidth / 2);
+            screenY = user.y - player.y + (windowHeight / 2);
 
             pCtx.fillStyle = user.color;
             drawRectRot(pCtx, screenX , screenY, user.width, user.height, user.rotation);
@@ -276,7 +297,7 @@ function World(){
             midX = user.x + (user.width / 2);
             midY = user.y + (user.height / 2);
 
-            turretRot(pCtx, midX, midY, 0, 0, user.turretRot);
+            turretRot(pCtx, screenX + user.width / 2, screenY + user.height / 2, 0, 0, user.turretRot);
 
             pCtx.font = "16px Arial";
             pCtx.fillStyle = "black";
@@ -285,31 +306,32 @@ function World(){
           }
       }
 
-      /*
+      
       map = this.maps.index[this.mapIndex];
 
       for (var x = 0; x < map.walls.length; x++){
         wall = map.walls[x];
 
-        coords = getScaledCoords(wall.x, wall.y, wall.width, wall.height);
+        screenX = wall.x - player.x + (windowWidth / 2);
+        screenY = wall.y - player.y + (windowHeight / 2);
 
         bCtx.fillStyle = wall.color;
-        bCtx.fillRect(coords.x, coords.y, coords.width, coords.height);
+        bCtx.fillRect(screenX, screenY, wall.width, wall.height);
 
         bCtx.strokeStyle = "black";
         bCtx.lineWidth = 2;
-        bCtx.strokeRect(coords.x, coords.y, coords.width, coords.height);
+        bCtx.strokeRect(screenX, screenY, wall.width, wall.height);
 
       }
-      */
+      
 
       for (var x = 0; x < this.bullets.length; x++){
         bullet = this.bullets[x];
 
-        screenX = bullet.x;
-        screenY = bullet.y;
+        screenX = bullet.x - player.x + (windowWidth / 2);
+        screenY = bullet.y - player.y + (windowHeight / 2);
 
-        pCtx.fillStyle = "gray";
+        pCtx.fillStyle = "red";
         pCtx.strokeStyle = "black";
 
         pCtx.beginPath();
@@ -338,6 +360,9 @@ function Player(){
   this.x;
   this.y;
 
+  this.screenX;
+  this.screenY;
+
   this.midX; // Midpoint of tank
   this.midY;
 
@@ -351,9 +376,12 @@ function Player(){
   this.width = 30;
   this.height = 60;
 
-  // Whether player will hit into wall on next frame if pushing the W or S key
+  // Whether player will hit into wall on next frame if pushing the W S A or D key
   this.wCol = false;
   this.sCol = false;
+
+  this.aCol = false;
+  this.dCol = false;
 
   this.type;
 
@@ -376,16 +404,19 @@ function Player(){
 
       if (ui.pauseScreenUp == false){
 
+        this.midX = this.x + (this.width / 2);
+        this.midY = this.y + (this.height / 2);
+
         // Calcs deltaX and deltaY based on rotation and speed
         movement = calcAngleCoords(this.rotation, this.speed);
 
-        //player.wallCollision(movement);
+        player.wallCollision(movement);
 
-        if (this.movement.left == true){
+        if (this.movement.left == true && this.aCol == false){
           this.rotation -= this.rotationSpeed;
         }
 
-        if (this.movement.right == true){
+        if (this.movement.right == true && this.dCol == false){
           this.rotation += this.rotationSpeed;
         }
 
@@ -394,7 +425,7 @@ function Player(){
           this.y -= movement.y;
         }
 
-        if (this.movement.down == true){
+        if (this.movement.down == true && this.sCol == false){
           this.x += movement.x;
           this.y += movement.y;
         }
@@ -408,10 +439,7 @@ function Player(){
           this.rotation = 360 + this.rotation;
         }
 
-        this.midX = this.x + (this.width / 2);
-        this.midY = this.y + (this.height / 2);
-
-        this.turretRot = calcAngleDegrees(this.midX - ui.mouseX, this.midY - ui.mouseY) - 90;
+        this.turretRot = calcAngleDegrees((this.screenX + (this.width / 2)) - ui.mouseX, ((this.screenY + (this.height / 2)) - ui.mouseY)) - 90;
 
         if (ui.click == true){
           this.fire();
@@ -427,18 +455,18 @@ function Player(){
 
   Player.prototype.render = function(){
     // Draw Player
-    screenX = this.x;
-    screenY = this.y;
+    this.screenX = windowWidth / 2;
+    this.screenY = windowHeight / 2;
 
     pCtx.fillStyle = this.color;
-    drawRectRot(pCtx, screenX , screenY, this.width, this.height, this.rotation);
+    drawRectRot(pCtx, this.screenX , this.screenY, this.width, this.height, this.rotation);
 
     pCtx.lineWidth = 2;
     pCtx.strokeStyle = "black";
 
-    strokeRectRot(pCtx, screenX , screenY, this.width, this.height, this.rotation);
+    strokeRectRot(pCtx, this.screenX , this.screenY, this.width, this.height, this.rotation);
 
-    turretRot(pCtx, this.midX, this.midY, 0, 0, this.turretRot);
+    turretRot(pCtx, this.screenX + (this.width / 2), this.screenY + (this.height / 2), 0, 0, this.turretRot);
   }
 
   Player.prototype.wallCollision = function(movement){
@@ -447,24 +475,48 @@ function Player(){
 
     this.wCol = false;
     this.sCol = false;
+    this.aCol = false;
+    this.dCol = false;
 
-    newX = this.midX;
-    newY = this.midY;
+    newX = this.x;
+    newY = this.y;
+
+    newMidX = this.midX;
+    newMidY = this.midY;
+
+    map = world.maps.index[world.mapIndex];
 
     if (this.movement.up == true){
+
       newX -= movement.x;
       newY -= movement.y;
 
-      map = world.maps.index[world.mapIndex];
+      newMidX -= movement.x;
+      newMidY -= movement.y;
 
-      // Gets scaled coords of wall
-      coords = getScaledCoords(wall.x, wall.y, wall.width, wall.height);
+      // Top left vertex
 
+      coords = rotatePoint([newMidX, newMidY], [newX, newY], this.rotation);
+      
       for (var x = 0; x < map.walls.length; x++){
         wall = map.walls[x];
 
-        if (newX > coords.x && newX < coords.x + coords.width){
-          if (newY > coords.y && newY < coords.y + coords.height){
+        if (coords.x > wall.x && coords.x < wall.x + wall.width){
+          if (coords.y > wall.y && coords.y < wall.y + wall.height){
+            this.wCol = true;
+          }
+        }
+      }
+
+      // Top right vertex
+
+      coords = rotatePoint([newMidX, newMidY], [newX + this.width, newY], this.rotation);
+      
+      for (var x = 0; x < map.walls.length; x++){
+        wall = map.walls[x];
+
+        if (coords.x > wall.x && coords.x < wall.x + wall.width){
+          if (coords.y > wall.y && coords.y < wall.y + wall.height){
             this.wCol = true;
           }
         }
@@ -472,8 +524,104 @@ function Player(){
     }
 
     if (this.movement.down == true){
+
       newX += movement.x;
       newY += movement.y;
+
+      newMidX += movement.x;
+      newMidY += movement.y;
+
+      // Bottom left vertex
+
+      coords = rotatePoint([newMidX, newMidY], [newX, newY + this.height], this.rotation);
+      
+      for (var x = 0; x < map.walls.length; x++){
+        wall = map.walls[x];
+
+        if (coords.x > wall.x && coords.x < wall.x + wall.width){
+          if (coords.y > wall.y && coords.y < wall.y + wall.height){
+            this.sCol = true;
+          }
+        }
+      }
+
+      // Bottom right vertex
+
+      coords = rotatePoint([newMidX, newMidY], [newX + this.width, newY + this.height], this.rotation);
+      
+      for (var x = 0; x < map.walls.length; x++){
+        wall = map.walls[x];
+
+        if (coords.x > wall.x && coords.x < wall.x + wall.width){
+          if (coords.y > wall.y && coords.y < wall.y + wall.height){
+            this.sCol = true;
+          }
+        }
+      }
+    }
+
+    if (this.movement.left == true){
+      newRotation = this.rotation;
+
+      newRotation -= this.rotationSpeed;
+
+      // Top left vertex
+      coords = rotatePoint([this.midX, this.midY], [this.x, this.y], newRotation);
+      
+      for (var x = 0; x < map.walls.length; x++){
+        wall = map.walls[x];
+
+        if (coords.x > wall.x && coords.x < wall.x + wall.width){
+          if (coords.y > wall.y && coords.y < wall.y + wall.height){
+            this.aCol = true;
+          }
+        }
+      }
+
+      // Bottom right vertex
+      coords = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y + this.height], newRotation);
+      
+      for (var x = 0; x < map.walls.length; x++){
+        wall = map.walls[x];
+
+        if (coords.x > wall.x && coords.x < wall.x + wall.width){
+          if (coords.y > wall.y && coords.y < wall.y + wall.height){
+            this.aCol = true;
+          }
+        }
+      }
+    }
+
+    if (this.movement.right == true){
+      newRotation = this.rotation;
+
+      newRotation -= this.rotationSpeed;
+
+      // Top right vertex
+      coords = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y], newRotation);
+      
+      for (var x = 0; x < map.walls.length; x++){
+        wall = map.walls[x];
+
+        if (coords.x > wall.x && coords.x < wall.x + wall.width){
+          if (coords.y > wall.y && coords.y < wall.y + wall.height){
+            this.dCol = true;
+          }
+        }
+      }
+
+      // Bottom left vertex
+      coords = rotatePoint([this.midX, this.midY], [this.x, this.y + this.height], newRotation);
+      
+      for (var x = 0; x < map.walls.length; x++){
+        wall = map.walls[x];
+
+        if (coords.x > wall.x && coords.x < wall.x + wall.width){
+          if (coords.y > wall.y && coords.y < wall.y + wall.height){
+            this.dCol = true;
+          }
+        }
+      }
     }
 
   }
@@ -485,8 +633,8 @@ function Player(){
     cX = 0;
     cY = 0;
 
-    targetX = ui.mouseX;
-    targetY = ui.mouseY;
+    targetX = ui.mouseWx;
+    targetY = ui.mouseWy;
     
     // Finds how many pixels arrow has to travel in X axis for every pixel in Y axis
     cX = (this.midX - targetX) / (this.midY - targetY); // Change (x / y)

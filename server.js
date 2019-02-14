@@ -3,15 +3,22 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 var socketIO = require('socket.io');
+
+// Get map data
+var fs = require('fs');
+eval(fs.readFileSync('client/js/maps.js')+'');
+
 var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 app.set('port', process.env.PORT || 5000);
 app.use('/client', express.static(__dirname + '/client'));
+
 // Routing
 app.get('/', function(request, response) {
   response.sendFile(path.join(__dirname, 'client/index.html'));
 });
+
 // Starts the server.
 server.listen(process.env.PORT || 5000, function() {
   console.log('Starting server on port 5000');
@@ -52,6 +59,9 @@ function Game(){
   // 0: Lobby 1: In Game 2: End Game Screen
 
   this.mode = 0;
+
+  this.maps = new Maps();
+  this.mapIndex = 0;
   
   this.players = {};
   this.bullets = [];
@@ -82,6 +92,7 @@ function Game(){
       bullet.x += bullet.cX;
       bullet.y += bullet.cY;
 
+      // Player collision detection
       for (var id in game.players) {
         user = game.players[id];
         
@@ -94,6 +105,21 @@ function Game(){
           }
         }
       }
+
+      
+      map = this.maps.index[this.mapIndex];
+
+      for (var y = 0; y < map.walls.length; y++){
+        wall = map.walls[y];
+
+        if (bullet.x > wall.x && bullet.x < wall.x + wall.width){
+          if (bullet.y > wall.y && bullet.y < wall.y + wall.height){
+            this.bullets.splice(x, 1);
+          }
+        }
+
+      }
+
     }
   }
 
@@ -102,7 +128,34 @@ function Game(){
 
     for (var id in game.players) {
       user = game.players[id];
-      io.to(id).emit('change position', random(0, 600), random(0, 600));
+
+      // Temorary
+      randomNum = Math.floor(Math.random() * 4);
+
+      x = 100;
+      y = 100;
+
+      if (randomNum == 0){
+        x = random(100, 300);
+        y = random(100, 300);
+      }
+
+      if (randomNum == 1){
+        x = random(600, 900);
+        y = random(600, 900); 
+      }
+
+      if (randomNum == 2){
+        x = random(100, 300);
+        y = random(600, 900);
+      }
+
+      if (randomNum == 3){
+        x = random(600, 900);
+        y = random(100, 300);
+      }
+
+      io.to(id).emit('change position', x, y);
       user.type = 'playing';
     }
   }
@@ -174,7 +227,7 @@ function communication(socket){
     // Ensures new players automatically start playing in devMode
     if (devMode == true){
       type = 'playing';
-      io.to(socket.id).emit('change position', random(0, 600), random(0, 600));
+      io.to(socket.id).emit('change position', 150, 150);
     }
 
     game.players[socket.id] = {
@@ -268,4 +321,5 @@ function communication(socket){
 io.on('connection', function(socket) {communication(socket)});
 
 init();
+
 
