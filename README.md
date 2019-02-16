@@ -5,6 +5,10 @@ An example can be found here: https://battle-tank.herokuapp.com/
 ### v1.0-beta
 * Switched back to relative positioning for simplicity in scaling
 * Collision with walls for tanks
+* Collision with walls for bullets
+* Map
+* Better collision for bullets and tanks
+* Smart random spawining in beginning of game
 
 ### Bugs
 * Players don't change position immediately when starting a game
@@ -12,18 +16,12 @@ An example can be found here: https://battle-tank.herokuapp.com/
 
 ## Planned
 
-### v1.0-beta
-* Map
-* Collision with walls for bullets
-* Better collision for bullets and tanks
-* Smart random spawining in beginning of game
-
 ### v2.0-beta
-* Abillity to pick map for host and set how much health players have 1 - 5 hits
 * Health Bar
 * Explosions
 * Cool down when firing
 * Many maps with different sizes (small, medium, large), (island map with reverse collision)
+* Abillity to pick map for host and set how much health players have 1 - 5 hits
 
 ### v1.0
 * Fleshed-out UI and transitions

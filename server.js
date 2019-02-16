@@ -51,8 +51,21 @@ function everySecond(){
   frame = 0;
 }
 
+function isUndefined(variable){
+  if (variable === undefined){
+    return true;
+  }else{
+    return false;
+  }
+}
+
 function random(min, max) {
   return Math.floor(Math.random() * (max - min) ) + min;
+}
+
+function findDistance(width, height){
+  total = width * width + height * height;
+  return Math.sqrt(total);
 }
 
 function Game(){
@@ -92,16 +105,59 @@ function Game(){
       bullet.x += bullet.cX;
       bullet.y += bullet.cY;
 
+      bullet.x = bullet.x;
+      bullet.y = bullet.y;
+
       // Player collision detection
       for (var id in game.players) {
         user = game.players[id];
         
-        if (bullet.owner != id){
-          if (bullet.x >= user.x && bullet.x <= user.x + user.width){
-            if (bullet.y >= user.y && bullet.y <= user.y + user.height){
-              io.to(id).emit('hit by bullet');
-              this.bullets.splice(x, 1);
-            }
+        if (bullet.owner != id && user.dead == false){
+          // Approximates tank collision with 3 circles
+
+          // Collision with bullet
+
+          // Get midpoint of bottom and top edge of tank
+          tmX = (user.tl.x + user.tr.x) / 2;
+          tmY = (user.tl.y + user.tr.y) / 2;
+
+          bmX = (user.bl.x + user.br.x) / 2;
+          bmY = (user.bl.y + user.br.y) / 2;
+
+          // Midpoint of each midpoint from before and midpoint of tank
+          tmX = (tmX + user.midX) / 2;
+          tmY = (tmY + user.midY) / 2;
+
+          bmX = (bmX + user.midX) / 2;
+          bmY = (bmY + user.midY) / 2;
+
+          radius = user.width / 2;
+          collision = false;
+
+          // Top circle
+          dist = findDistance(bullet.x - tmX, bullet.y - tmY);
+        
+          if (dist < radius){
+            collision = true;
+          }
+
+          // Bottom circle
+          dist = findDistance(bullet.x - bmX, bullet.y - bmY);
+          
+          if (dist < radius){
+            collision = true;
+          }
+
+          // Mid circle
+          dist = findDistance(bullet.x - user.midX, bullet.y - user.midY);
+          
+          if (dist < radius){
+            collision = true;
+          }
+
+          if (collision == true){
+            this.bullets.splice(x, 1);
+            io.to(id).emit('hit by bullet', x, y);
           }
         }
       }
@@ -129,35 +185,48 @@ function Game(){
     for (var id in game.players) {
       user = game.players[id];
 
-      // Temorary
-      randomNum = Math.floor(Math.random() * 4);
+      coords = this.choosePosition();
 
-      x = 100;
-      y = 100;
-
-      if (randomNum == 0){
-        x = random(100, 300);
-        y = random(100, 300);
-      }
-
-      if (randomNum == 1){
-        x = random(600, 900);
-        y = random(600, 900); 
-      }
-
-      if (randomNum == 2){
-        x = random(100, 300);
-        y = random(600, 900);
-      }
-
-      if (randomNum == 3){
-        x = random(600, 900);
-        y = random(100, 300);
-      }
-
-      io.to(id).emit('change position', x, y);
+      io.to(id).emit('change position', coords.x, coords.y);
       user.type = 'playing';
     }
+  }
+
+  Game.prototype.choosePosition = function(){
+    map = this.maps.index[this.mapIndex];
+
+    // Get bounds of map
+
+    mapX = 100;
+    mapY = 100;
+
+    width = map.width - 100;
+    height = map.height - 100;
+
+    // Try 15 times to get a good random spawn, if that fails spawn at 100, 100
+    for (var x = 0; x < 15; x++){
+      spawnX = random(mapX, width);
+      spawnY = random(mapY, height);
+
+      goodSpawn = true;
+
+      for (var x = 0; x < map.walls.length; x++){
+        wall = map.walls[x];
+
+        if (spawnX + 30 > wall.x && spawnX < wall.x + wall.width){
+          if (spawnY + 60 > wall.y && spawnY < wall.y + wall.height){
+            goodSpawn = false;
+          }
+        }
+      }
+
+      if (goodSpawn == true){
+        return {x: spawnX, y: spawnY};
+      }
+    }
+
+    return {x: 100, y: 100};
+  
   }
 
   Game.prototype.checkEndGame = function(){
@@ -227,7 +296,8 @@ function communication(socket){
     // Ensures new players automatically start playing in devMode
     if (devMode == true){
       type = 'playing';
-      io.to(socket.id).emit('change position', 150, 150);
+      coords = game.choosePosition();
+      io.to(socket.id).emit('change position', coords.x, coords.y);
     }
 
     game.players[socket.id] = {
@@ -301,6 +371,16 @@ function communication(socket){
 
     player.width = data.width;
     player.height = data.height;
+
+    player.dead = data.dead;
+
+    player.midX = data.midX;
+    player.midY = data.midY;
+
+    player.tl = data.tl;
+    player.tr = data.tr;
+    player.br = data.br;
+    player.bl = data.bl;
   });
 
   socket.on('fire', function(x, y, endX, endY, rotation, cX, cY, owner) {

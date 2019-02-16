@@ -107,7 +107,7 @@ function UI(){
       case 1:
         this.pauseButton();
 
-        if (player.type == 'spectator'){
+        if (player.type == 'spectator' && this.diedScreenUp == false){
           this.spectating();
         }
 
@@ -149,7 +149,7 @@ function UI(){
 
   UI.prototype.debugScreen = function(){
     uCtx.fillStyle = "black";
-    uCtx.font = this.textSize + "px Arial";
+    uCtx.font = 16 + "px Arial";
 
     // Difference in y value between elements
     space = 20;
@@ -334,14 +334,25 @@ function UI(){
   }
 
   UI.prototype.spectating = function(){
-    uCtx.font = "40px Arial";
+
+
+
+    // Text Coords
+    uCtx.font = "30px Arial";
     spectateText = "Spectating";
     spectateWidth = uCtx.measureText(spectateText).width;
     spectateX = Math.floor(windowWidth / 2 - spectateWidth / 2);
-    spectateY = windowHeight * 0.2;
+    spectateY = 35;
 
+    // Box
+    uCtx.fillStyle = "black";
+    uCtx.fillRect(spectateX, 44, spectateWidth, 2);
+
+    // Draw Coords
     uCtx.fillStyle = "rgb(50, 50, 50)";
     uCtx.fillText(spectateText, spectateX, spectateY);
+
+
   }
 
   UI.prototype.lobby = function(){
@@ -434,7 +445,7 @@ function UI(){
       x ++;
     }
 
-    if (player.host == true){
+    if (player.host == true && Object.keys(world.players).length > 1){
       // Start game button
       // Back Button
       startText = "Start Game";

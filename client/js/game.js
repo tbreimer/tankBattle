@@ -25,7 +25,7 @@ if (devMode == true){
 }
 
 
-color = colors[Math.floor(Math.random() * colors.length)];//prompt("Enter your color");
+color = colors[Math.floor(Math.random() * colors.length)]; //prompt("Enter your color");
 
 // Canvas
 var bCanvas = document.getElementById('bgLayer');
@@ -60,7 +60,7 @@ mode = 0;
 
 // Joins server in a fraction of a second to let everything settle
 if (devMode == true){
-  setTimeout(function(){ world.join(); }, 100);
+  setTimeout(function(){ world.join(); }, 150);
 }
 
 window.addEventListener('resize', resize);
@@ -346,6 +346,7 @@ function World(){
 
   World.prototype.join = function(){
     socket.emit('new player', player);
+    this.mode = 1;
     mode = 1;
   }
 }
@@ -375,6 +376,11 @@ function Player(){
 
   this.width = 30;
   this.height = 60;
+
+  this.tl; // x: and y: of each vertex
+  this.tr;
+  this.br;
+  this.bl;
 
   // Whether player will hit into wall on next frame if pushing the W S A or D key
   this.wCol = false;
@@ -406,6 +412,11 @@ function Player(){
 
         this.midX = this.x + (this.width / 2);
         this.midY = this.y + (this.height / 2);
+
+        this.tl = rotatePoint([this.midX, this.midY], [this.x, this.y], this.rotation);
+        this.tr = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y], this.rotation);
+        this.br = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y + this.height], this.rotation);
+        this.bl = rotatePoint([this.midX, this.midY], [this.x, this.y + this.height], this.rotation);
 
         // Calcs deltaX and deltaY based on rotation and speed
         movement = calcAngleCoords(this.rotation, this.speed);
@@ -450,6 +461,25 @@ function Player(){
 
       this.render();
 
+    }else if (this.type == "spectator"){
+      if (ui.diedScreenUp == false){
+        if (this.movement.up == true){
+          this.y -= (this.speed * 1.5);
+        }
+
+        if (this.movement.down == true){
+          this.y += (this.speed * 1.5);
+        }
+
+        if (this.movement.left == true){
+          this.x -= (this.speed * 1.5);
+        }
+
+        if (this.movement.right == true){
+          this.x += (this.speed * 1.5);
+        }
+      }
+      
     }
   }
 
@@ -663,6 +693,12 @@ function Player(){
     if (this.health <= 0){
       this.dead = true;
       ui.diedScreenUp = true;
+
+      this.movement.up = false;
+      this.movement.down = false;
+      this.movement.right = false;
+      this.movement.left = false;
+
       socket.emit("player died", this.socketID);
     }
   }

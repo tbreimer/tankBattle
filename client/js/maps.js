@@ -5,8 +5,8 @@ function Maps(){
 function BattleGrounds(){
   this.name = "Battle Grounds";
 
-  this.width = 1600;
-  this.height = 900;
+  this.width = 1000;
+  this.height = 1000;
 
   this.backGround = "rgb(240, 240, 240)";
 
