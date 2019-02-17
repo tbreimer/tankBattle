@@ -3,7 +3,7 @@ socket.on('message', function(data) {
   console.log(data);
 });
 
-devMode = true;
+devMode = false;
 
 function makeid() {
   var text = "";
