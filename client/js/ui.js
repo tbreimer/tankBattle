@@ -17,7 +17,7 @@ function button(x, y, width, height, text, textOffset, font, centered){
   textY = y + textOffset;
 
   // Outline
-  uCtx.strokeStyle = "rgb(50, 50, 50)";
+  uCtx.strokeStyle = "rgb(135, 135, 135)";
   uCtx.lineWidth = 2;
 
   uCtx.fillStyle = "rgb(230, 230, 230)";
@@ -29,7 +29,7 @@ function button(x, y, width, height, text, textOffset, font, centered){
   if (ui.mouseX > x && ui.mouseX < x + width){
     if (ui.mouseY > y && ui.mouseY < y + height){
 
-      uCtx.fillStyle = "rgb(170, 170, 170)";
+      uCtx.fillStyle = "rgb(135, 135, 135)";
       uCtx.fillRect(x, y, width, height);
 
       if (ui.click == true){
@@ -40,7 +40,7 @@ function button(x, y, width, height, text, textOffset, font, centered){
   }
 
   // Draw text
-  uCtx.fillStyle = "rgb(50, 50, 50)";
+  uCtx.fillStyle = "rgb(80, 80, 80)";
   uCtx.fillText(text, textX, textY);
 
   if (clicked == true){
@@ -106,6 +106,7 @@ function UI(){
         break;
       case 1:
         this.pauseButton();
+        this.dataBar();
 
         if (player.type == 'spectator' && this.diedScreenUp == false){
           this.spectating();
@@ -181,6 +182,36 @@ function UI(){
     }
   }
 
+  UI.prototype.dataBar = function(){
+
+    height = 40;
+    width = Math.floor(windowWidth / 5);
+
+    x = windowWidth / 2 - width / 2;
+    y = 20;
+
+    // Gray bar
+    uCtx.fillStyle = "rgb(230, 230, 230)";
+    uCtx.fillRect(x, y, width, height);
+
+    uCtx.strokeStyle = "rgb(135, 135, 135)";
+    uCtx.strokeRect(x, y, width, height);
+
+    if (player.health > 1){
+
+      // Health indicator
+      multiplier = (width - 20) / player.maxHealth;
+      uCtx.fillStyle = "red";
+      uCtx.fillRect(x + 10, y + 9, player.health * multiplier, height - 25);
+
+      // Reload indicator
+      multiplier = (width - 20) / player.reloadTime;
+      uCtx.fillStyle = "DeepSkyBlue";
+      uCtx.fillRect(x + 10, y + 24, Math.abs(player.reload - player.reloadTime) * multiplier, height - 32);
+    }
+    
+  }
+
   UI.prototype.pauseScreen = function(){
     // Background
     bgWidth = windowWidth / 2;
@@ -189,7 +220,7 @@ function UI(){
     bgX = (windowWidth / 2) - (bgWidth / 2);
     bgY = (windowHeight / 2) - (bgHeight / 2);
 
-    uCtx.strokeStyle = "rgb(50, 50, 50)";
+    uCtx.strokeStyle = "rgb(135, 135, 135)";
     uCtx.lineWidth = 2;
 
     uCtx.fillStyle = "rgb(230, 230, 230)";
@@ -254,7 +285,7 @@ function UI(){
     bgX = (windowWidth / 2) - (bgWidth / 2);
     bgY = (windowHeight / 2) - (bgHeight / 2);
 
-    uCtx.strokeStyle = "rgb(50, 50, 50)";
+    uCtx.strokeStyle = "rgb(135, 135, 135)";
     uCtx.lineWidth = 2;
 
     uCtx.fillStyle = "rgb(230, 230, 230)";
@@ -335,21 +366,28 @@ function UI(){
 
   UI.prototype.spectating = function(){
 
+    height = 40;
+    width = Math.floor(windowWidth / 5);
 
+    x = windowWidth / 2 - width / 2;
+    y = 20;
+
+    // Gray bar
+    uCtx.fillStyle = "rgb(230, 230, 230)";
+    uCtx.fillRect(x, y, width, height);
+
+    uCtx.strokeStyle = "rgb(135, 135, 135)";
+    uCtx.strokeRect(x, y, width, height);
 
     // Text Coords
-    uCtx.font = "30px Arial";
+    uCtx.font = "20px Arial";
     spectateText = "Spectating";
     spectateWidth = uCtx.measureText(spectateText).width;
     spectateX = Math.floor(windowWidth / 2 - spectateWidth / 2);
-    spectateY = 35;
-
-    // Box
-    uCtx.fillStyle = "black";
-    uCtx.fillRect(spectateX, 44, spectateWidth, 2);
+    spectateY = 47;
 
     // Draw Coords
-    uCtx.fillStyle = "rgb(50, 50, 50)";
+    uCtx.fillStyle = "rgb(80, 80, 80)";
     uCtx.fillText(spectateText, spectateX, spectateY);
 
 

@@ -2,13 +2,10 @@
 This repository tracks the development an online multiplayer tank battle game using Node.js
 An example can be found here: https://battle-tank.herokuapp.com/
 
-### v1.0-beta
-* Switched back to relative positioning for simplicity in scaling
-* Collision with walls for tanks
-* Collision with walls for bullets
-* Map
-* Better collision for bullets and tanks
-* Smart random spawining in beginning of game
+### v2.0-beta
+* Health Bar
+* Cool down when firing
+* Explosions
 
 ### Bugs
 * Players don't change position immediately when starting a game
@@ -17,19 +14,16 @@ An example can be found here: https://battle-tank.herokuapp.com/
 ## Planned
 
 ### v2.0-beta
-* Health Bar
-* Explosions
-* Cool down when firing
 * Many maps with different sizes (small, medium, large), (island map with reverse collision)
 * Abillity to pick map for host and set how much health players have 1 - 5 hits
 
 ### v1.0
+* Chat (Server says who kills who in chat)
+* Commands
+* Show current stats in lobby
 * Fleshed-out UI and transitions
 * Credits page
 * Stats page (kill/death, accuracy, wins)
-* Show current stats in lobby
-* Chat (Server says who kills who in chat)
-* Commands
 
 ### Future
 * Powerups

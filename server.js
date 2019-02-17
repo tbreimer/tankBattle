@@ -157,7 +157,9 @@ function Game(){
 
           if (collision == true){
             this.bullets.splice(x, 1);
-            io.to(id).emit('hit by bullet', x, y);
+            io.to(id).emit('hit by bullet');
+            io.sockets.emit('explosion', bullet.x, bullet.y, "small");
+
           }
         }
       }
@@ -171,6 +173,7 @@ function Game(){
         if (bullet.x > wall.x && bullet.x < wall.x + wall.width){
           if (bullet.y > wall.y && bullet.y < wall.y + wall.height){
             this.bullets.splice(x, 1);
+            io.sockets.emit('explosion', bullet.x, bullet.y, "small");
           }
         }
 
@@ -354,8 +357,9 @@ function communication(socket){
     game.start();
   });
 
-  socket.on('player died', function(socketID){
+  socket.on('player died', function(socketID, x, y){
     game.players[socketID].type = 'spectator';
+    io.sockets.emit('explosion', x, y, "large");
   });
 
   socket.on('player data', function(data) {

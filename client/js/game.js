@@ -3,7 +3,7 @@ socket.on('message', function(data) {
   console.log(data);
 });
 
-devMode = false;
+devMode = true;
 
 function makeid() {
   var text = "";
@@ -16,9 +16,9 @@ function makeid() {
   return text;
 }
 
-colors = ["green", "blue", "purple", "red", "orange", "violet", "brown"];
+colors = ["Gold", "Khaki", "Coral", "darkorange", "green", "Aquamarine", "CornflowerBlue", "red", "orange", "DeepPink", "MediumSpringGreen", "MediumSeaGreen", "LightSeaGreen", "Crimson", "HotPink", "Burlywood", "Sienna", "Orchid", "SlateBlue", "SlateGray"];
 
-if (devMode == true){
+if (devMode == false){
   username = makeid();
 }else{
   username = prompt("Username");
@@ -251,10 +251,10 @@ function rotatePoint(pivot, point, angle) {
   angle = angle * Math.PI / 180;
 
   // Rotate clockwise, angle in radians
-  var x = Math.round((Math.cos(angle) * (point[0] - pivot[0])) -
+  var x = ((Math.cos(angle) * (point[0] - pivot[0])) -
                      (Math.sin(angle) * (point[1] - pivot[1])) +
                      pivot[0]),
-      y = Math.round((Math.sin(angle) * (point[0] - pivot[0])) +
+      y = ((Math.sin(angle) * (point[0] - pivot[0])) +
                      (Math.cos(angle) * (point[1] - pivot[1])) +
                      pivot[1]);
   return {x: x, y: y};
@@ -267,8 +267,10 @@ function World(){
   this.players = {};
 
   this.bullets = [];
-  this.bulletSpeed = 10;
+  this.bulletSpeed = 15;
   this.bulletDamage = 10;
+
+  this.explosions = [];
 
   this.maps = new Maps();
   this.mapIndex = 0;
@@ -277,6 +279,21 @@ function World(){
 
     this.canvasTopX = player.x - ((windowWidth / 2));
     this.canvasTopY = player.y - ((windowHeight / 2));
+
+    for (var x = 0; x < this.bullets.length; x++){
+        bullet = this.bullets[x];
+
+        screenX = bullet.x - player.x + (windowWidth / 2);
+        screenY = bullet.y - player.y + (windowHeight / 2);
+
+        pCtx.fillStyle = "red";
+        pCtx.strokeStyle = "orange";
+
+        pCtx.beginPath();
+        pCtx.arc(screenX, screenY, 4, 0, 2 * Math.PI);
+        pCtx.fill();
+        pCtx.stroke();
+    }
 
     if (this.mode == 1 || this.mode == 2){
         for (var id in this.players) {
@@ -323,23 +340,35 @@ function World(){
         bCtx.strokeRect(screenX, screenY, wall.width, wall.height);
 
       }
-      
 
-      for (var x = 0; x < this.bullets.length; x++){
-        bullet = this.bullets[x];
+      for (var x = 0; x < this.explosions.length; x++){
+        explosion = this.explosions[x];
 
-        screenX = bullet.x - player.x + (windowWidth / 2);
-        screenY = bullet.y - player.y + (windowHeight / 2);
+        screenX = explosion.x - player.x + (windowWidth / 2);
+        screenY = explosion.y - player.y + (windowHeight / 2);
 
-        pCtx.fillStyle = "red";
-        pCtx.strokeStyle = "black";
+        pCtx.fillStyle = "orange";
+        pCtx.strokeStyle = "darkorange";
 
         pCtx.beginPath();
-        pCtx.arc(screenX, screenY, 4, 0, 2 * Math.PI);
+        pCtx.globalAlpha = Math.round(explosion.transparency * 100) / 100;
+        pCtx.arc(screenX, screenY, explosion.radius, 0, 2 * Math.PI);
         pCtx.fill();
         pCtx.stroke();
+        pCtx.globalAlpha = 1;
 
+        if (explosion.type == "small"){
+          explosion.radius += 0.5;
+          explosion.transparency -= 0.05;
 
+        }else if (explosion.type == "large"){
+          explosion.radius += 2;
+          explosion.transparency -= 0.05;
+        }
+
+        if (explosion.transparency <= 0){
+          this.explosions.splice(x, 1);
+        }
       }
     }
   }
@@ -377,6 +406,9 @@ function Player(){
   this.width = 30;
   this.height = 60;
 
+  this.reload = 0; // 0 Means player can fire
+  this.reloadTime = 30;
+
   this.tl; // x: and y: of each vertex
   this.tr;
   this.br;
@@ -409,6 +441,10 @@ function Player(){
     if (this.type == 'playing'){
 
       if (ui.pauseScreenUp == false){
+
+        if (this.reload > 0){
+          this.reload -= 1;
+        }
 
         this.midX = this.x + (this.width / 2);
         this.midY = this.y + (this.height / 2);
@@ -449,6 +485,15 @@ function Player(){
         if (this.rotation < 0){
           this.rotation = 360 + this.rotation;
         }
+
+        // Recalculate vertexes based on new movement
+        this.midX = this.x + (this.width / 2);
+        this.midY = this.y + (this.height / 2);
+
+        this.tl = rotatePoint([this.midX, this.midY], [this.x, this.y], this.rotation);
+        this.tr = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y], this.rotation);
+        this.br = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y + this.height], this.rotation);
+        this.bl = rotatePoint([this.midX, this.midY], [this.x, this.y + this.height], this.rotation);
 
         this.turretRot = calcAngleDegrees((this.screenX + (this.width / 2)) - ui.mouseX, ((this.screenY + (this.height / 2)) - ui.mouseY)) - 90;
 
@@ -496,7 +541,25 @@ function Player(){
 
     strokeRectRot(pCtx, this.screenX , this.screenY, this.width, this.height, this.rotation);
 
+    // Lines on tank
+    pCtx.beginPath();
+    pCtx.moveTo(Math.floor(this.midX - player.x + (windowWidth / 2)), Math.floor(this.midY - player.y + (windowHeight / 2)));
+    pCtx.lineTo(Math.floor(this.bl.x - player.x + (windowWidth / 2)), Math.floor(this.bl.y - player.y + (windowHeight / 2)));
+    pCtx.stroke();
+
+    pCtx.beginPath();
+    pCtx.moveTo(Math.floor(this.midX - player.x + (windowWidth / 2)), Math.floor(this.midY - player.y + (windowHeight / 2)));
+    pCtx.lineTo(Math.floor(this.br.x - player.x + (windowWidth / 2)), Math.floor(this.br.y - player.y + (windowHeight / 2)));
+    pCtx.stroke();
+
+    pCtx.beginPath();
+    pCtx.moveTo(Math.floor(this.midX - player.x + (windowWidth / 2)), Math.floor(this.midY - player.y + (windowHeight / 2)));
+    pCtx.lineTo(Math.floor(((this.tr.x + this.tl.x) / 2) - player.x + (windowWidth / 2)), Math.floor(((this.tr.y + this.tl.y) / 2) - player.y + (windowHeight / 2)));
+    pCtx.stroke();
+
     turretRot(pCtx, this.screenX + (this.width / 2), this.screenY + (this.height / 2), 0, 0, this.turretRot);
+
+    
   }
 
   Player.prototype.wallCollision = function(movement){
@@ -657,34 +720,38 @@ function Player(){
   }
 
   Player.prototype.fire = function(){
-    this.degrees = calcAngleDegrees(this.midX - this.targetX, this.midY - this.targetY) - 90;
-    
-    // The change per frame in x and y coords to move arrow to target
-    cX = 0;
-    cY = 0;
+    if (this.reload <= 0){
+      this.reload = this.reloadTime;
 
-    targetX = ui.mouseWx;
-    targetY = ui.mouseWy;
-    
-    // Finds how many pixels arrow has to travel in X axis for every pixel in Y axis
-    cX = (this.midX - targetX) / (this.midY - targetY); // Change (x / y)
-    cY = 1;
+      this.degrees = calcAngleDegrees(this.midX - this.targetX, this.midY - this.targetY) - 90;
+      
+      // The change per frame in x and y coords to move arrow to target
+      cX = 0;
+      cY = 0;
 
-    // Solves for a ratio that makes the arrow travel at the speed
-    ratio = (Math.sqrt((cX * cX) + (cY * cY))) / (world.bulletSpeed);
-    
-    // Redefine using ratio
-    cX = cX / ratio;
-    cY = cY / ratio;
+      targetX = ui.mouseWx;
+      targetY = ui.mouseWy;
+      
+      // Finds how many pixels arrow has to travel in X axis for every pixel in Y axis
+      cX = (this.midX - targetX) / (this.midY - targetY); // Change (x / y)
+      cY = 1;
 
-    // Negate values if target needs to go the opposite way
-    if (this.midY - targetY > 0){
-      cX = -cX;
-      cY = -cY;
+      // Solves for a ratio that makes the arrow travel at the speed
+      ratio = (Math.sqrt((cX * cX) + (cY * cY))) / (world.bulletSpeed);
+      
+      // Redefine using ratio
+      cX = cX / ratio;
+      cY = cY / ratio;
+
+      // Negate values if target needs to go the opposite way
+      if (this.midY - targetY > 0){
+        cX = -cX;
+        cY = -cY;
+      }
+
+      degrees = calcAngleDegrees(player.midX - targetX, player.midY - targetY) - 90;
+      socket.emit('fire', player.midX, player.midY, ui.mouseX, ui.mouseY, degrees, cX, cY, this.socketID);
     }
-
-    degrees = calcAngleDegrees(player.midX - targetX, player.midY - targetY) - 90;
-    socket.emit('fire', player.midX, player.midY, ui.mouseX, ui.mouseY, degrees, cX, cY, this.socketID);
   }
 
   Player.prototype.damage = function(amount){
@@ -699,7 +766,7 @@ function Player(){
       this.movement.right = false;
       this.movement.left = false;
 
-      socket.emit("player died", this.socketID);
+      socket.emit("player died", this.socketID, this.midX, this.midY);
     }
   }
 
@@ -731,8 +798,33 @@ socket.on('state', function(data) {
   }
 });
 
+function Explosion(x, y, type){
+  this.x = x;
+  this.y = y;
+  this.type = type;
+  this.time = 0;
+
+  this.transparency = 1;
+
+
+  switch (this.type) {
+    case "small":
+      this.radius = 4;
+      break;
+    case "large":
+      this.radius = 25;
+      break;
+  }
+
+
+}
+
 socket.on('connect', function() {
   player.socketID = socket.io.engine.id;; // Player knows its own socketID
+});
+
+socket.on('explosion', function(x, y, type){
+  world.explosions.push(new Explosion(x, y, type));
 });
 
 socket.on('change position', function(x, y) {
