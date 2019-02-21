@@ -203,11 +203,15 @@ function UI(){
       multiplier = (width - 20) / player.maxHealth;
       uCtx.fillStyle = "red";
       uCtx.fillRect(x + 10, y + 9, player.health * multiplier, height - 25);
+      uCtx.strokeStyle = "rgb(165, 0, 0)";
+      uCtx.strokeRect(x + 10, y + 9, player.health * multiplier, height - 25);
 
       // Reload indicator
       multiplier = (width - 20) / player.reloadTime;
       uCtx.fillStyle = "DeepSkyBlue";
-      uCtx.fillRect(x + 10, y + 24, Math.abs(player.reload - player.reloadTime) * multiplier, height - 32);
+      uCtx.fillRect(x + 10, y + 26, Math.abs(player.reload - player.reloadTime) * multiplier, height - 34);
+      uCtx.strokeStyle = "rgb(0, 141, 188)";
+      uCtx.strokeRect(x + 10, y + 26, Math.abs(player.reload - player.reloadTime) * multiplier, height - 34);
     }
     
   }
@@ -407,9 +411,9 @@ function UI(){
       socket.emit('leave');
     }
 
-    // Players Label
+    // Lobby Label
     uCtx.font = "70px Arial";
-    playersText = "Players";
+    playersText = "Lobby";
     playersWidth = uCtx.measureText(playersText).width;
     playersX = Math.floor(windowWidth / 2 - playersWidth / 2);
     playersY = 90;
@@ -422,10 +426,10 @@ function UI(){
       var user = world.players[id];
 
       // Outline
-      playerWidth = windowWidth * .75;
+      playerWidth = windowWidth * .5;
       playerHeight = 40;
       playerY = x * 45 + 200;
-      playerX = (windowWidth / 2) - (playerWidth / 2);
+      playerX = 70;
 
       uCtx.strokeStyle = "black";
       uCtx.lineWidth = 2;
@@ -483,9 +487,140 @@ function UI(){
       x ++;
     }
 
+    // Players Label
+    uCtx.font = "40px Arial";
+    playersText = "Players";
+    playersWidth = uCtx.measureText(playersText).width;
+    playersX = Math.floor(windowWidth / 4 - playersWidth / 2) + 70;
+    playersY = 175;
+
+    uCtx.fillStyle = "rgb(50, 50, 50)";
+    uCtx.fillText(playersText, playersX, playersY);
+
+    // Maps
+    maps = world.maps.index;
+    for (var x = 0; x < maps.length; x ++){
+      // Outline
+      mapWidth = windowWidth - (70 + windowWidth / 2 + 90);
+      mapHeight = 40;
+      mapY = x * 45 + 200;
+      mapX = (70 + windowWidth / 2 + 60);
+
+
+      // Highlight Selected One
+      if (x == world.mapIndex){
+        uCtx.fillStyle = "rgb(230, 230, 230)";
+        uCtx.fillRect(mapX, mapY, mapWidth, mapHeight);
+      }
+
+      // Highlight one moused over if player is host and also if clicked change map
+      if (player.host == true){
+        if (ui.mouseX > mapX && ui.mouseX < mapX + mapWidth)
+          if (ui.mouseY > mapY && ui.mouseY < mapY + mapHeight){
+            uCtx.fillStyle = "rgb(230, 230, 230)";
+            uCtx.fillRect(mapX, mapY, mapWidth, mapHeight);
+
+            if (ui.click == true){
+              world.changeMap(x);
+            }
+          }
+      }
+
+      // Outline
+      uCtx.strokeStyle = "black";
+      uCtx.lineWidth = 2;
+      uCtx.strokeRect(mapX, mapY, mapWidth, mapHeight);
+
+      // Name
+      nameX = mapX + 15;
+      nameY = mapY + 27;
+      nameText = maps[x].name;
+
+      uCtx.fillStyle = "black";
+      uCtx.font = "20px Arial";
+      uCtx.fillText(nameText, nameX, nameY);
+
+      // Size
+      sizeText = maps[x].size;
+      sizeWidth = uCtx.measureText(sizeText).width;
+      sizeX = mapX + mapWidth - sizeWidth - 13;
+      sizeY = mapY + 27;
+      
+
+      uCtx.fillStyle = "black";
+      uCtx.font = "20px Arial";
+      uCtx.fillText(sizeText, sizeX, sizeY);
+
+    
+    }
+
+    // Map Label
+    uCtx.font = "40px Arial";
+    mapText = "Map";
+    mapWidth = uCtx.measureText(mapText).width;
+    // If you ever end up needing to edit any of this code, you're better off just rewriting the whole thing.
+    mapX = (70 + windowWidth / 2 + 60) + ((windowWidth - (70 + windowWidth / 2 + 90))/ 2) - (mapWidth / 2);
+    mapY = 175;
+
+    uCtx.fillStyle = "rgb(50, 50, 50)";
+    uCtx.fillText(mapText, mapX, mapY);
+
+    // Health Label
+    uCtx.font = "40px Arial";
+    healthText = "Health";
+    healthWidth = uCtx.measureText(healthText).width;
+    healthX = (70 + windowWidth / 2 + 60) + ((windowWidth - (70 + windowWidth / 2 + 90))/ 2) - (healthWidth / 2);
+    healthY = 175 + (world.maps.index.length * 45) + 75;
+
+    uCtx.fillStyle = "rgb(50, 50, 50)";
+    uCtx.fillText(healthText, healthX, healthY);
+
+    healthSelectWidth = windowWidth - (70 + windowWidth / 2 + 90);
+    interval = healthSelectWidth / 5;
+    selectWidth = interval - 5;
+    selectHeight = 40;
+
+    for (x = 0; x < 5; x++){
+      selectX = (70 + windowWidth / 2 + 60) + (x * interval);
+      selectY = healthY + 25;
+
+      // Select if that value is current starting health
+      if ((10 + (x * 10)) == player.maxHealth){
+        uCtx.fillStyle = "rgb(230, 230, 230)";
+        uCtx.fillRect(selectX, selectY, selectWidth, selectHeight);
+      }
+
+      // Select if host
+      if (player.host == true){
+        if (ui.mouseX > selectX && ui.mouseX < selectX + selectWidth)
+          if (ui.mouseY > selectY && ui.mouseY < selectY + selectHeight){
+            uCtx.fillStyle = "rgb(230, 230, 230)";
+            uCtx.fillRect(selectX, selectY, selectWidth, selectHeight);
+
+            if (ui.click == true){
+              world.changeStartingHealth(10 + (x * 10));
+            }
+          }
+      }
+
+      // Health Boxes
+      uCtx.strokeStyle = 2;
+      uCtx.strokeRect(selectX, selectY, selectWidth, selectHeight);
+
+      uCtx.fillStyle = "black";
+      uCtx.font = "20px Arial";
+
+      // Health Text
+      numberText = 10 + (x * 10);
+      numberWidth = uCtx.measureText(numberText).width;
+      numberX = selectX + (selectWidth / 2) - (numberWidth / 2);
+      numberY = selectY + 27;
+
+      uCtx.fillText(numberText, numberX, numberY);
+    }
+
     if (player.host == true && Object.keys(world.players).length > 1){
       // Start game button
-      // Back Button
       startText = "Start Game";
       startX = windowWidth - 170;
       startY = windowHeight - 90;

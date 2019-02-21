@@ -18,7 +18,7 @@ function makeid() {
 
 colors = ["Gold", "Khaki", "Coral", "darkorange", "green", "Aquamarine", "CornflowerBlue", "red", "orange", "DeepPink", "MediumSpringGreen", "MediumSeaGreen", "LightSeaGreen", "Crimson", "HotPink", "Burlywood", "Sienna", "Orchid", "SlateBlue", "SlateGray"];
 
-if (devMode == false){
+if (devMode == true){
   username = makeid();
 }else{
   username = prompt("Username");
@@ -121,6 +121,9 @@ function updateGame(data){
   world.players = data.players;
   world.mode = data.mode;
   world.winner = data.winner;
+
+  world.mapIndex = data.mapIndex;
+  player.maxHealth = data.startingHealth;
 
   for (var id in world.players) {
     if (id == player.socketID){
@@ -262,12 +265,12 @@ function rotatePoint(pivot, point, angle) {
 
 
 function World(){
-  // 0: In Lobby 1: In game
+  // 0: In Lobby 1: In game 2: Spectating
   this.mode;
   this.players = {};
 
   this.bullets = [];
-  this.bulletSpeed = 15;
+  this.bulletSpeed = 13;
   this.bulletDamage = 10;
 
   this.explosions = [];
@@ -277,28 +280,67 @@ function World(){
 
   World.prototype.update = function(){
 
-    this.canvasTopX = player.x - ((windowWidth / 2));
-    this.canvasTopY = player.y - ((windowHeight / 2));
-
-    for (var x = 0; x < this.bullets.length; x++){
-        bullet = this.bullets[x];
-
-        screenX = bullet.x - player.x + (windowWidth / 2);
-        screenY = bullet.y - player.y + (windowHeight / 2);
-
-        pCtx.fillStyle = "red";
-        pCtx.strokeStyle = "orange";
-
-        pCtx.beginPath();
-        pCtx.arc(screenX, screenY, 4, 0, 2 * Math.PI);
-        pCtx.fill();
-        pCtx.stroke();
-    }
-
     if (this.mode == 1 || this.mode == 2){
+
+      this.canvasTopX = player.x - ((windowWidth / 2));
+      this.canvasTopY = player.y - ((windowHeight / 2));
+
+      // Draw Background
+      map = this.maps.index[this.mapIndex];
+      bCtx.fillStyle = map.background;
+      bCtx.fillRect(0, 0, windowWidth, windowHeight);
+
+      // Draw Islands
+
+      if (map.island == true){
+        // Stroke islands
+        for (var x = 0; x < map.islands.length; x++){
+          island = map.islands[x];
+
+          screenX = island.x - player.x + (windowWidth / 2);
+          screenY = island.y - player.y + (windowHeight / 2);
+
+          bCtx.strokeStyle = island.strokeColor;
+          bCtx.strokeRect(screenX, screenY, island.width, island.height);
+
+        }
+
+        // Fill islands
+        for (var x = 0; x < map.islands.length; x++){
+          island = map.islands[x];
+
+          screenX = island.x - player.x + (windowWidth / 2);
+          screenY = island.y - player.y + (windowHeight / 2);
+
+          bCtx.fillStyle = island.color;
+          bCtx.fillRect(screenX, screenY, island.width, island.height);
+
+        }
+      }
+
+      // Draw Bullets
+
+      for (var x = 0; x < this.bullets.length; x++){
+          bullet = this.bullets[x];
+
+          screenX = bullet.x - player.x + (windowWidth / 2);
+          screenY = bullet.y - player.y + (windowHeight / 2);
+
+          pCtx.fillStyle = "red";
+          pCtx.strokeStyle = "black";
+
+          pCtx.beginPath();
+          pCtx.arc(screenX, screenY, 4, 0, 2 * Math.PI);
+          pCtx.fill();
+          pCtx.stroke();
+      }
+
+      // Draw other players
+
+      
         for (var id in this.players) {
           var user = this.players[id];
- 
+
           if (user.type == 'playing' && id != player.socketID){
             screenX = user.x - player.x + (windowWidth / 2);
             screenY = user.y - player.y + (windowHeight / 2);
@@ -321,53 +363,67 @@ function World(){
             textWidth = pCtx.measureText(user.username).width;
             pCtx.fillText(user.username, screenX - (textWidth / 2) + (player.width / 2), screenY - 20);
           }
-      }
+        
 
-      
-      map = this.maps.index[this.mapIndex];
+        // Stroke Walls
+        
+        map = this.maps.index[this.mapIndex];
 
-      for (var x = 0; x < map.walls.length; x++){
-        wall = map.walls[x];
+        for (var x = 0; x < map.walls.length; x++){
+          wall = map.walls[x];
 
-        screenX = wall.x - player.x + (windowWidth / 2);
-        screenY = wall.y - player.y + (windowHeight / 2);
+          screenX = wall.x - player.x + (windowWidth / 2);
+          screenY = wall.y - player.y + (windowHeight / 2);
 
-        bCtx.fillStyle = wall.color;
-        bCtx.fillRect(screenX, screenY, wall.width, wall.height);
+          bCtx.strokeStyle = wall.strokeColor;
+          bCtx.lineWidth = wall.stroke;
+          bCtx.strokeRect(screenX, screenY, wall.width, wall.height);
 
-        bCtx.strokeStyle = "black";
-        bCtx.lineWidth = 2;
-        bCtx.strokeRect(screenX, screenY, wall.width, wall.height);
-
-      }
-
-      for (var x = 0; x < this.explosions.length; x++){
-        explosion = this.explosions[x];
-
-        screenX = explosion.x - player.x + (windowWidth / 2);
-        screenY = explosion.y - player.y + (windowHeight / 2);
-
-        pCtx.fillStyle = "orange";
-        pCtx.strokeStyle = "darkorange";
-
-        pCtx.beginPath();
-        pCtx.globalAlpha = Math.round(explosion.transparency * 100) / 100;
-        pCtx.arc(screenX, screenY, explosion.radius, 0, 2 * Math.PI);
-        pCtx.fill();
-        pCtx.stroke();
-        pCtx.globalAlpha = 1;
-
-        if (explosion.type == "small"){
-          explosion.radius += 0.5;
-          explosion.transparency -= 0.05;
-
-        }else if (explosion.type == "large"){
-          explosion.radius += 2;
-          explosion.transparency -= 0.05;
         }
 
-        if (explosion.transparency <= 0){
-          this.explosions.splice(x, 1);
+        // Fill Walls
+
+        for (var x = 0; x < map.walls.length; x++){
+          wall = map.walls[x];
+
+          screenX = wall.x - player.x + (windowWidth / 2);
+          screenY = wall.y - player.y + (windowHeight / 2);
+
+          bCtx.fillStyle = wall.color;
+          bCtx.fillRect(screenX, screenY, wall.width, wall.height);
+
+        }
+
+        // Explosions
+
+        for (var x = 0; x < this.explosions.length; x++){
+          explosion = this.explosions[x];
+
+          screenX = explosion.x - player.x + (windowWidth / 2);
+          screenY = explosion.y - player.y + (windowHeight / 2);
+
+          pCtx.fillStyle = "orange";
+          pCtx.strokeStyle = "darkorange";
+
+          pCtx.beginPath();
+          pCtx.globalAlpha = Math.round(explosion.transparency * 100) / 100;
+          pCtx.arc(screenX, screenY, explosion.radius, 0, 2 * Math.PI);
+          pCtx.fill();
+          pCtx.stroke();
+          pCtx.globalAlpha = 1;
+
+          if (explosion.type == "small"){
+            explosion.radius += 0.5;
+            explosion.transparency -= 0.05;
+
+          }else if (explosion.type == "large"){
+            explosion.radius += 2;
+            explosion.transparency -= 0.05;
+          }
+
+          if (explosion.transparency <= 0){
+            this.explosions.splice(x, 1);
+          }
         }
       }
     }
@@ -377,6 +433,14 @@ function World(){
     socket.emit('new player', player);
     this.mode = 1;
     mode = 1;
+  }
+
+  World.prototype.changeMap = function(mapIndex){
+    socket.emit('change map', mapIndex);
+  }
+
+  World.prototype.changeStartingHealth = function(value){
+    socket.emit('change starting health', value);
   }
 }
 
@@ -407,7 +471,7 @@ function Player(){
   this.height = 60;
 
   this.reload = 0; // 0 Means player can fire
-  this.reloadTime = 30;
+  this.reloadTime = 20;
 
   this.tl; // x: and y: of each vertex
   this.tr;
@@ -429,8 +493,6 @@ function Player(){
     left: false,
     right: false
   };
-
-  this.bulletSpeed = 10;
 
   this.dead = false;
 
@@ -457,7 +519,12 @@ function Player(){
         // Calcs deltaX and deltaY based on rotation and speed
         movement = calcAngleCoords(this.rotation, this.speed);
 
-        player.wallCollision(movement);
+        this.wallCollision(movement);
+
+        // If map has island collision, test it
+        if (world.maps.index[world.mapIndex].island == true){
+          this.islandCollision(movement);
+        }
 
         if (this.movement.left == true && this.aCol == false){
           this.rotation -= this.rotationSpeed;
@@ -719,6 +786,167 @@ function Player(){
 
   }
 
+  Player.prototype.islandCollision = function(movement){
+    // This code predicts the coords if the player goes forward or backward, and if player is coliding with a wall
+    // in those coords, set wCol or sCol to true
+
+    this.speed = 3;
+
+    newX = this.x;
+    newY = this.y;
+
+    newMidX = this.midX;
+    newMidY = this.midY;
+
+    map = world.maps.index[world.mapIndex];
+
+    if (this.movement.up == true){
+
+      newX -= movement.x;
+      newY -= movement.y;
+
+      newMidX -= movement.x;
+      newMidY -= movement.y;
+
+      // Top left vertex
+
+      coords = rotatePoint([newMidX, newMidY], [newX, newY], this.rotation);
+      
+      for (var x = 0; x < map.islands.length; x++){
+        wall = map.islands[x];
+        
+        if (coords.x < wall.x || coords.x > wall.x + wall.width){
+          this.speed = 1;
+        }
+        if (coords.y < wall.y || coords.y > wall.y + wall.height){
+          this.speed = 1;
+        }
+      }
+
+      // Top right vertex
+
+      coords = rotatePoint([newMidX, newMidY], [newX + this.width, newY], this.rotation);
+      
+      for (var x = 0; x < map.islands.length; x++){
+        wall = map.islands[x];
+        
+        if (coords.x < wall.x || coords.x > wall.x + wall.width){
+          this.speed = 1;
+        }
+        if (coords.y < wall.y || coords.y > wall.y + wall.height){
+          this.speed = 1;
+        }
+      }
+    }
+
+    if (this.movement.down == true){
+
+      newX += movement.x;
+      newY += movement.y;
+
+      newMidX += movement.x;
+      newMidY += movement.y;
+
+      // Bottom left vertex
+
+      coords = rotatePoint([newMidX, newMidY], [newX, newY + this.height], this.rotation);
+      
+      for (var x = 0; x < map.islands.length; x++){
+        wall = map.islands[x];
+        
+        if (coords.x < wall.x || coords.x > wall.x + wall.width){
+          this.speed = 1;
+        }
+        if (coords.y < wall.y || coords.y > wall.y + wall.height){
+          this.speed = 1;
+        }
+      }
+
+      // Bottom right vertex
+
+      coords = rotatePoint([newMidX, newMidY], [newX + this.width, newY + this.height], this.rotation);
+      
+      for (var x = 0; x < map.islands.length; x++){
+        wall = map.islands[x];
+        
+        if (coords.x < wall.x || coords.x > wall.x + wall.width){
+          this.speed = 1;
+        }
+        if (coords.y < wall.y || coords.y > wall.y + wall.height){
+          this.speed = 1;
+        }
+      }
+    }
+
+    if (this.movement.left == true){
+      newRotation = this.rotation;
+
+      newRotation -= this.rotationSpeed;
+
+      // Top left vertex
+      coords = rotatePoint([this.midX, this.midY], [this.x, this.y], newRotation);
+      
+      for (var x = 0; x < map.islands.length; x++){
+        wall = map.islands[x];
+        
+        if (coords.x < wall.x || coords.x > wall.x + wall.width){
+          this.speed = 1;
+        }
+        if (coords.y < wall.y || coords.y > wall.y + wall.height){
+          this.speed = 1;
+        }
+      }
+
+      // Bottom right vertex
+      coords = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y + this.height], newRotation);
+      
+      for (var x = 0; x < map.islands.length; x++){
+        wall = map.islands[x];
+        
+        if (coords.x < wall.x || coords.x > wall.x + wall.width){
+          this.speed = 1;
+        }
+        if (coords.y < wall.y || coords.y > wall.y + wall.height){
+          this.speed = 1;
+        }
+      }
+    }
+
+    if (this.movement.right == true){
+      newRotation = this.rotation;
+
+      newRotation -= this.rotationSpeed;
+
+      // Top right vertex
+      coords = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y], newRotation);
+      
+      for (var x = 0; x < map.islands.length; x++){
+        wall = map.islands[x];
+        
+        if (coords.x < wall.x || coords.x > wall.x + wall.width){
+          this.speed = 1;
+        }
+        if (coords.y < wall.y || coords.y > wall.y + wall.height){
+          this.speed = 1;
+        }
+      }
+
+      // Bottom left vertex
+      coords = rotatePoint([this.midX, this.midY], [this.x, this.y + this.height], newRotation);
+      
+      for (var x = 0; x < map.islands.length; x++){
+        wall = map.islands[x];
+        
+        if (coords.x < wall.x || coords.x > wall.x + wall.width){
+          this.speed = 1;
+        }
+        if (coords.y < wall.y || coords.y > wall.y + wall.height){
+          this.speed = 1;
+        }
+      }
+    }
+  }
+
   Player.prototype.fire = function(){
     if (this.reload <= 0){
       this.reload = this.reloadTime;
@@ -776,8 +1004,7 @@ function Player(){
   }
 
   Player.prototype.reset = function(){
-    this.health = 30;
-    this.maxHealth = 30;
+    this.health = this.maxHealth;
     this.dead = false;
     ui.diedScreenUp = false;
   }
@@ -842,6 +1069,15 @@ socket.on('reset', function() {
 socket.on('get kicked', function(){
   console.log("Uh oh")
   window.location.replace("http://forestquest.net/kicked/kicked.html");
+});
+
+socket.on('map changed', function(mapIndex){
+  world.mapIndex = mapIndex;
+});
+
+socket.on('starting health changed', function(value){
+  player.health = value;
+  player.maxHealth = value;
 });
 
 function keyDown(evt){

@@ -6,6 +6,11 @@ An example can be found here: https://battle-tank.herokuapp.com/
 * Health Bar
 * Cool down when firing
 * Explosions
+* Walls are filled after the outline
+* Better spawning
+* Abillity to pick map for host and set how much health players have 1 - 5 hits
+* Tiny Island Map
+* Duel Map
 
 ### Bugs
 * Players don't change position immediately when starting a game
@@ -14,8 +19,11 @@ An example can be found here: https://battle-tank.herokuapp.com/
 ## Planned
 
 ### v2.0-beta
-* Many maps with different sizes (small, medium, large), (island map with reverse collision)
-* Abillity to pick map for host and set how much health players have 1 - 5 hits
+* Easier to hit players
+* Battle Grounds Map
+* Desert Storm Map
+* Grasslands Map
+* Archipelago Assault Map
 
 ### v1.0
 * Chat (Server says who kills who in chat)

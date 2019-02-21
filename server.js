@@ -75,6 +75,8 @@ function Game(){
 
   this.maps = new Maps();
   this.mapIndex = 0;
+
+  this.startingHealth = 30;
   
   this.players = {};
   this.bullets = [];
@@ -131,7 +133,7 @@ function Game(){
           bmX = (bmX + user.midX) / 2;
           bmY = (bmY + user.midY) / 2;
 
-          radius = user.width / 2;
+          radius = (user.width / 2) + 5;
           collision = false;
 
           // Top circle
@@ -183,7 +185,6 @@ function Game(){
   }
 
   Game.prototype.start = function(){
-    game.mode = 1;
 
     for (var id in game.players) {
       user = game.players[id];
@@ -193,23 +194,25 @@ function Game(){
       io.to(id).emit('change position', coords.x, coords.y);
       user.type = 'playing';
     }
+
+    game.mode = 1;
   }
 
   Game.prototype.choosePosition = function(){
     map = this.maps.index[this.mapIndex];
 
-    // Get bounds of map
-
-    mapX = 100;
-    mapY = 100;
-
-    width = map.width - 100;
-    height = map.height - 100;
 
     // Try 15 times to get a good random spawn, if that fails spawn at 100, 100
-    for (var x = 0; x < 15; x++){
-      spawnX = random(mapX, width);
-      spawnY = random(mapY, height);
+    for (var x = 0; x < 30; x++){
+      // Choose random spawnZone and get a random coordinate inside it
+      zoneIndex = random(0, map.spawnZones.length);
+
+      zone = map.spawnZones[zoneIndex];
+
+      spawnX = random(zone.x, zone.x + zone.width);
+      spawnY = random(zone.y, zone.y + zone.height);
+
+      // If player will spawn inside a wall, loops runs again and a new random coord is picked
 
       goodSpawn = true;
 
@@ -399,6 +402,16 @@ function communication(socket){
 
     var player = game.players[socket.id] || {};
     player.host = true;
+  });
+
+  socket.on('change map', function(mapIndex) {
+    game.mapIndex = mapIndex;
+    io.sockets.emit('map changed', mapIndex);
+  });
+
+  socket.on('change starting health', function(value) {
+    game.startingHealth = value;
+    io.sockets.emit('starting health changed', value);
   });
 }
 
