@@ -296,7 +296,9 @@ function communication(socket){
     if (game.mode == 0){
       type = 'lobby';
     }else if (game.mode == 1){
+      io.to(socket.id).emit('change position', game.maps.index[game.mapIndex].width / 2, game.maps.index[game.mapIndex].height / 2);
       type = 'spectator';
+      
     }
 
     // Ensures new players automatically start playing in devMode

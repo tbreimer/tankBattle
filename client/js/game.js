@@ -63,6 +63,9 @@ if (devMode == true){
   setTimeout(function(){ world.join(); }, 150);
 }
 
+//setTimeout(function(){ player.x = localStorage.getItem("x"); }, 300);
+//setTimeout(function(){ player.y = localStorage.getItem("y"); }, 300);
+
 window.addEventListener('resize', resize);
 
 function resize(){
@@ -84,6 +87,9 @@ function everySecond(){
   // Calculate fps
   fps = frame;
   frame = 0;
+
+  localStorage.setItem("x", player.x);
+      localStorage.setItem("y", player.y);
 }
 
 setInterval(everySecond, 1000);
@@ -451,8 +457,8 @@ function Player(){
   this.socketID = null;
   this.username = username;
   this.color = color;
-  this.x;
-  this.y;
+  this.x = 0;
+  this.y = 0;
 
   this.screenX;
   this.screenY;
@@ -787,163 +793,33 @@ function Player(){
   }
 
   Player.prototype.islandCollision = function(movement){
-    // This code predicts the coords if the player goes forward or backward, and if player is coliding with a wall
-    // in those coords, set wCol or sCol to true
 
     this.speed = 3;
-
-    newX = this.x;
-    newY = this.y;
 
     newMidX = this.midX;
     newMidY = this.midY;
 
     map = world.maps.index[world.mapIndex];
 
-    if (this.movement.up == true){
+    inside = false;
 
-      newX -= movement.x;
-      newY -= movement.y;
+    newMidX -= movement.x;
+    newMidY -= movement.y;
 
-      newMidX -= movement.x;
-      newMidY -= movement.y;
-
-      // Top left vertex
-
-      coords = rotatePoint([newMidX, newMidY], [newX, newY], this.rotation);
+    // Top left vertex
+    
+    for (var x = 0; x < map.islands.length; x++){
+      wall = map.islands[x];
       
-      for (var x = 0; x < map.islands.length; x++){
-        wall = map.islands[x];
-        
-        if (coords.x < wall.x || coords.x > wall.x + wall.width){
-          this.speed = 1;
-        }
-        if (coords.y < wall.y || coords.y > wall.y + wall.height){
-          this.speed = 1;
-        }
-      }
-
-      // Top right vertex
-
-      coords = rotatePoint([newMidX, newMidY], [newX + this.width, newY], this.rotation);
-      
-      for (var x = 0; x < map.islands.length; x++){
-        wall = map.islands[x];
-        
-        if (coords.x < wall.x || coords.x > wall.x + wall.width){
-          this.speed = 1;
-        }
-        if (coords.y < wall.y || coords.y > wall.y + wall.height){
-          this.speed = 1;
-        }
+      if (newMidX > wall.x && newMidX < wall.x + wall.width && newMidY > wall.y && newMidY < wall.y + wall.height){
+        inside = true;
       }
     }
 
-    if (this.movement.down == true){
-
-      newX += movement.x;
-      newY += movement.y;
-
-      newMidX += movement.x;
-      newMidY += movement.y;
-
-      // Bottom left vertex
-
-      coords = rotatePoint([newMidX, newMidY], [newX, newY + this.height], this.rotation);
-      
-      for (var x = 0; x < map.islands.length; x++){
-        wall = map.islands[x];
-        
-        if (coords.x < wall.x || coords.x > wall.x + wall.width){
-          this.speed = 1;
-        }
-        if (coords.y < wall.y || coords.y > wall.y + wall.height){
-          this.speed = 1;
-        }
-      }
-
-      // Bottom right vertex
-
-      coords = rotatePoint([newMidX, newMidY], [newX + this.width, newY + this.height], this.rotation);
-      
-      for (var x = 0; x < map.islands.length; x++){
-        wall = map.islands[x];
-        
-        if (coords.x < wall.x || coords.x > wall.x + wall.width){
-          this.speed = 1;
-        }
-        if (coords.y < wall.y || coords.y > wall.y + wall.height){
-          this.speed = 1;
-        }
-      }
-    }
-
-    if (this.movement.left == true){
-      newRotation = this.rotation;
-
-      newRotation -= this.rotationSpeed;
-
-      // Top left vertex
-      coords = rotatePoint([this.midX, this.midY], [this.x, this.y], newRotation);
-      
-      for (var x = 0; x < map.islands.length; x++){
-        wall = map.islands[x];
-        
-        if (coords.x < wall.x || coords.x > wall.x + wall.width){
-          this.speed = 1;
-        }
-        if (coords.y < wall.y || coords.y > wall.y + wall.height){
-          this.speed = 1;
-        }
-      }
-
-      // Bottom right vertex
-      coords = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y + this.height], newRotation);
-      
-      for (var x = 0; x < map.islands.length; x++){
-        wall = map.islands[x];
-        
-        if (coords.x < wall.x || coords.x > wall.x + wall.width){
-          this.speed = 1;
-        }
-        if (coords.y < wall.y || coords.y > wall.y + wall.height){
-          this.speed = 1;
-        }
-      }
-    }
-
-    if (this.movement.right == true){
-      newRotation = this.rotation;
-
-      newRotation -= this.rotationSpeed;
-
-      // Top right vertex
-      coords = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y], newRotation);
-      
-      for (var x = 0; x < map.islands.length; x++){
-        wall = map.islands[x];
-        
-        if (coords.x < wall.x || coords.x > wall.x + wall.width){
-          this.speed = 1;
-        }
-        if (coords.y < wall.y || coords.y > wall.y + wall.height){
-          this.speed = 1;
-        }
-      }
-
-      // Bottom left vertex
-      coords = rotatePoint([this.midX, this.midY], [this.x, this.y + this.height], newRotation);
-      
-      for (var x = 0; x < map.islands.length; x++){
-        wall = map.islands[x];
-        
-        if (coords.x < wall.x || coords.x > wall.x + wall.width){
-          this.speed = 1;
-        }
-        if (coords.y < wall.y || coords.y > wall.y + wall.height){
-          this.speed = 1;
-        }
-      }
+    if (inside == true){
+      this.speed = 3;
+    }else{
+      this.speed = 1;
     }
   }
 

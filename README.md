@@ -11,19 +11,15 @@ An example can be found here: https://battle-tank.herokuapp.com/
 * Abillity to pick map for host and set how much health players have 1 - 5 hits
 * Tiny Island Map
 * Duel Map
+* Battle Grounds Map
+* Archipelago Assault Map
+* Easier to hit players
 
 ### Bugs
 * Players don't change position immediately when starting a game
 * Players can clip through walls in the edges
 
 ## Planned
-
-### v2.0-beta
-* Easier to hit players
-* Battle Grounds Map
-* Desert Storm Map
-* Grasslands Map
-* Archipelago Assault Map
 
 ### v1.0
 * Chat (Server says who kills who in chat)
