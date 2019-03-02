@@ -186,7 +186,7 @@ function ArchipelagoAssault(){
   this.spawnZones = [
     new Zone(4000, 3000, 2000, 2000),
     new Zone(1000, 1000, 6000, 1500),
-    new Island(3000, 5100, 4000, 600)
+    new Zone(3000, 5100, 4000, 600)
   ];
 };
 

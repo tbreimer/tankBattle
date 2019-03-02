@@ -74,12 +74,14 @@ function Game(){
   this.mode = 0;
 
   this.maps = new Maps();
-  this.mapIndex = 0;
+  this.mapIndex = 1;
 
   this.startingHealth = 30;
   
   this.players = {};
   this.bullets = [];
+
+  this.chat = ["Server Started!"];
 
   this.winner; // Username of who won the last game
 
@@ -87,6 +89,7 @@ function Game(){
 
     if (Object.keys(game.players).length == 0 && devMode == false){
       this.mode = 0;
+      this.chat = ["Server Started!"];
     }
 
     if (devMode == true){
@@ -161,6 +164,17 @@ function Game(){
             this.bullets.splice(x, 1);
             io.to(id).emit('hit by bullet');
             io.sockets.emit('explosion', bullet.x, bullet.y, "small");
+
+            io.to(bullet.owner).emit('hit'); // For stats
+            
+            if (user.health <= 10){
+              died = user.username;
+              killed = this.players[bullet.owner].username;
+
+              io.to(bullet.owner).emit('kill');
+
+              this.newMessage(died + " was killed by " + killed);
+            }
 
           }
         }
@@ -238,20 +252,26 @@ function Game(){
   Game.prototype.checkEndGame = function(){
     number = 0;
     name = "";
+    winnerId = "";
 
     for (var id in game.players) {
       user = game.players[id];
 
-      
       if (user.type == 'playing'){
         number += 1;
         name = user.username;
+        winnerId = id;
       }
     }
 
     if (number < 2){
       game.winner = name;
       game.mode = 2;
+
+      io.to(winnerId).emit('you won');
+
+      this.newMessage(name + " Won!");
+
       setTimeout(function(){ game.reset(); }, 3000);
     }
   }
@@ -266,6 +286,40 @@ function Game(){
     }
 
     game.mode = 0;
+  }
+
+  Game.prototype.newMessage = function(message){
+
+    if (message != null && message != ""){
+
+      // Splits message up into 20 character chunks
+      length = message.length;
+
+      newMessage = [];
+
+      lastSplice = null;
+
+      for (var x = 0; x < length; x++){
+        if (x % 27 == 0 && x != 0){
+
+          selectedSection = message.slice(x - 27, x);
+
+          lastSplice = x;
+
+          newMessage.push(selectedSection);
+        }
+      }
+
+      if (lastSplice != null){
+        newMessage.push(message.slice(lastSplice, length));
+      }
+
+      if (length < 27){
+        newMessage = message;
+      }
+
+      game.chat = game.chat.concat(newMessage);
+    }
   }
 }
 
@@ -312,13 +366,24 @@ function communication(socket){
       username: player.username,
       color: player.color,
       host: playerHosts,
-      type: type
+      type: type,
+
+      gameKills: 0,
+      gameDeaths: 0,
+      gameHits: 0,
+      gameShots: 0,
+      gameWins: 0,
+      gameGames: 0
     };
+
+    game.newMessage(player.username + " joined the game");
   });
 
   // Triggered when user closes tab
   socket.on('disconnect', function() {
     if (game.players.hasOwnProperty(socket.id) == true){ // Ensures that socket ID is in game.players, preventing posible error
+      game.newMessage(game.players[socket.id].username + " left the game");
+
       newHostRequired = false;
       if (game.players[socket.id].host == true){
         newHostRequired = true;
@@ -338,6 +403,9 @@ function communication(socket){
   // Triggered when user goes back to main menu
   socket.on('leave', function() {
     if (game.players.hasOwnProperty(socket.id) == true){ // Ensures that socket ID is in game.players, preventing posible error
+
+      game.newMessage(game.players[socket.id].username + " left the game");
+
       newHostRequired = false;
       if (game.players[socket.id].host == true){
         newHostRequired = true;
@@ -352,6 +420,8 @@ function communication(socket){
         game.players[ran_key].host = true;
       }
     }
+
+
   });
 
   socket.on('kick', function(socketID) {
@@ -390,6 +460,13 @@ function communication(socket){
     player.tr = data.tr;
     player.br = data.br;
     player.bl = data.bl;
+
+    player.gameKills = data.gameKills;
+    player.gameDeaths = data.gameDeaths;
+    player.gameHits = data.gameHits;
+    player.gameShots = data.gameShots;
+    player.gameWins = data.gameWins;
+    player.gameGames = data.gameGames;
   });
 
   socket.on('fire', function(x, y, endX, endY, rotation, cX, cY, owner) {
@@ -414,6 +491,10 @@ function communication(socket){
   socket.on('change starting health', function(value) {
     game.startingHealth = value;
     io.sockets.emit('starting health changed', value);
+  });
+
+  socket.on('new message', function(message) {
+    game.chat = game.chat.concat(message);
   });
 }
 

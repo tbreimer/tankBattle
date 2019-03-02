@@ -1,3 +1,9 @@
+/*
+-kills
+-hits
+-wins
+*/
+
 var socket = io();
 socket.on('message', function(data) {
   console.log(data);
@@ -17,13 +23,6 @@ function makeid() {
 }
 
 colors = ["Gold", "Khaki", "Coral", "darkorange", "green", "Aquamarine", "CornflowerBlue", "red", "orange", "DeepPink", "MediumSpringGreen", "MediumSeaGreen", "LightSeaGreen", "Crimson", "HotPink", "Burlywood", "Sienna", "Orchid", "SlateBlue", "SlateGray"];
-
-if (devMode == true){
-  username = makeid();
-}else{
-  username = prompt("Username");
-}
-
 
 color = colors[Math.floor(Math.random() * colors.length)]; //prompt("Enter your color");
 
@@ -63,9 +62,6 @@ if (devMode == true){
   setTimeout(function(){ world.join(); }, 150);
 }
 
-//setTimeout(function(){ player.x = localStorage.getItem("x"); }, 300);
-//setTimeout(function(){ player.y = localStorage.getItem("y"); }, 300);
-
 window.addEventListener('resize', resize);
 
 function resize(){
@@ -88,14 +84,16 @@ function everySecond(){
   fps = frame;
   frame = 0;
 
-  localStorage.setItem("x", player.x);
-      localStorage.setItem("y", player.y);
+  // Update stats
+  player.updateStats();
+
 }
 
 setInterval(everySecond, 1000);
 
 function init(){
   resize();
+  player.getStats();
   update();
 }
 
@@ -130,6 +128,8 @@ function updateGame(data){
 
   world.mapIndex = data.mapIndex;
   player.maxHealth = data.startingHealth;
+
+  world.chat = data.chat;
 
   for (var id in world.players) {
     if (id == player.socketID){
@@ -283,6 +283,8 @@ function World(){
 
   this.maps = new Maps();
   this.mapIndex = 0;
+
+  this.chat = [];
 
   World.prototype.update = function(){
 
@@ -455,7 +457,7 @@ function Player(){
   this.maxHealth = 30;
 
   this.socketID = null;
-  this.username = username;
+  this.username = makeid();
   this.color = color;
   this.x = 0;
   this.y = 0;
@@ -477,7 +479,7 @@ function Player(){
   this.height = 60;
 
   this.reload = 0; // 0 Means player can fire
-  this.reloadTime = 20;
+  this.reloadTime = 18;
 
   this.tl; // x: and y: of each vertex
   this.tr;
@@ -503,6 +505,24 @@ function Player(){
   this.dead = false;
 
   this.host;
+
+  this.kills = 0;
+  this.deaths = 0;
+
+  this.hits = 0;
+  this.shots = 0;
+
+  this.wins = 0;
+  this.games = 0;
+
+  this.gameKills = 0;
+  this.gameDeaths = 0;
+
+  this.gameHits = 0;
+  this.gameShots = 0;
+
+  this.gameWins = 0;
+  this.gameGames = 0;
 
   Player.prototype.update = function(){
 
@@ -824,6 +844,9 @@ function Player(){
   }
 
   Player.prototype.fire = function(){
+    this.shots += 1;
+    this.gameShots += 1;
+
     if (this.reload <= 0){
       this.reload = this.reloadTime;
 
@@ -870,6 +893,9 @@ function Player(){
       this.movement.right = false;
       this.movement.left = false;
 
+      this.deaths += 1;
+      this.gameDeaths += 1;
+
       socket.emit("player died", this.socketID, this.midX, this.midY);
     }
   }
@@ -883,6 +909,161 @@ function Player(){
     this.health = this.maxHealth;
     this.dead = false;
     ui.diedScreenUp = false;
+
+    this.games += 1;
+    this.gameGames += 1;
+  }
+
+  Player.prototype.newMessage = function(){
+    message = prompt("Enter a message");
+
+    if (message == "$: host"){ // Host Command
+      socket.emit('change host');
+
+    }else if (message == "$: kick"){
+      username = prompt("Kick Who?");
+
+      for (var id in world.players) {
+        var user = world.players[id];
+
+        if (username == user.username){
+          socket.emit('kick', id);
+        }
+      }
+
+    }else if(message == "$: health"){
+      this.health = prompt("Health");
+
+    }else if(message == "$: reload"){
+      this.reloadTime = prompt("Reload");
+
+    }else if (message == "$: map"){
+      mapID = prompt("Map ID");
+
+      world.changeMap(mapID);
+
+    }else if (message == "$: tp"){
+      x = prompt("X");
+      y = prompt("Y");
+
+      this.changePosition(x, y);
+
+    }else if (message != null && message != ""){
+
+      message = this.username + ": " + message;
+
+      // Splits message up into 20 character chunks
+      length = message.length;
+
+      newMessage = [];
+
+      lastSplice = null;
+
+      for (var x = 0; x < length; x++){
+        if (x % 27 == 0 && x != 0){
+
+          selectedSection = message.slice(x - 27, x);
+
+          lastSplice = x;
+
+          newMessage.push(selectedSection);
+        }
+      }
+
+      if (lastSplice != null){
+        newMessage.push(message.slice(lastSplice, length));
+      }
+
+      if (length < 27){
+        newMessage = message;
+      }
+
+      socket.emit('new message', newMessage);
+    }
+  }
+
+  Player.prototype.getStats = function(){
+    kills = parseInt(localStorage.getItem("kills"));
+
+    if (kills == null || isNaN(kills)){
+      this.kills = 0;
+    }else{
+      this.kills = kills;
+    }
+
+    deaths = parseInt(localStorage.getItem("deaths"));
+
+    if (deaths == null || isNaN(kills)){
+      this.deaths = 0;
+    }else{
+      this.deaths = deaths;
+    }
+
+    hits = parseInt(localStorage.getItem("hits"));
+
+    if (hits == null || isNaN(kills)){
+      this.hits = 0;
+    }else{
+      this.hits = hits;
+    }
+
+    shots = parseInt(localStorage.getItem("shots"));
+
+    if (shots == null || isNaN(kills)){
+      this.shots = 0;
+    }else{
+      this.shots = shots;
+    }
+
+    wins = parseInt(localStorage.getItem("wins"));
+
+    if (wins == null || isNaN(kills)){
+      this.wins = 0;
+    }else{
+      this.wins = wins;
+    }
+
+    games = parseInt(localStorage.getItem("games"));
+
+    if (games == null || isNaN(kills)){
+      this.games = 0;
+    }else{
+      this.games = games;
+    }
+
+    username = localStorage.getItem("username");
+
+    if (username == null){
+      // :)
+    }else{
+      this.username = username;
+    }
+  }
+
+  Player.prototype.updateStats = function(){
+    localStorage.setItem("kills", this.kills);
+    localStorage.setItem("deaths", this.deaths);
+    localStorage.setItem("hits", this.hits);
+    localStorage.setItem("shots", this.shots);
+    localStorage.setItem("wins", this.wins);
+    localStorage.setItem("games", this.games);
+  }
+
+  Player.prototype.changeUsername = function(){
+    newUsername = prompt("Enter new username (limit 15 characters)");
+    this.username = newUsername.substring(0, 15);
+    localStorage.setItem("username", this.username);
+  }
+
+  Player.prototype.resetStats = function(){
+    localStorage.setItem("kills", 0);
+    localStorage.setItem("deaths", 0);
+    localStorage.setItem("hits", 0);
+    localStorage.setItem("shots", 0);
+    localStorage.setItem("wins", 0);
+    localStorage.setItem("games", 0);
+
+    this.getStats();
   }
 }
 
@@ -954,6 +1135,21 @@ socket.on('map changed', function(mapIndex){
 socket.on('starting health changed', function(value){
   player.health = value;
   player.maxHealth = value;
+});
+
+socket.on('hit', function(value){
+  player.hits += 1;
+  player.gameHits += 1;
+});
+
+socket.on('kill', function(value){
+  player.kills += 1;
+  player.gameKills += 1;
+});
+
+socket.on('you won', function(value){
+  player.wins += 1;
+  player.gameWins += 1;
 });
 
 function keyDown(evt){

@@ -17,19 +17,18 @@ function button(x, y, width, height, text, textOffset, font, centered){
   textY = y + textOffset;
 
   // Outline
-  uCtx.strokeStyle = "rgb(135, 135, 135)";
+  uCtx.strokeStyle = "rgb(100, 100, 100)";
   uCtx.lineWidth = 2;
 
-  uCtx.fillStyle = "rgb(230, 230, 230)";
+  uCtx.fillStyle = "rgb(235, 235, 235)";
   uCtx.fillRect(x, y, width, height);
-  uCtx.strokeRect(x, y, width, height);
-
+  
   clicked = false;
 
   if (ui.mouseX > x && ui.mouseX < x + width){
     if (ui.mouseY > y && ui.mouseY < y + height){
 
-      uCtx.fillStyle = "rgb(135, 135, 135)";
+      uCtx.fillStyle = "rgb(200, 200, 200)";
       uCtx.fillRect(x, y, width, height);
 
       if (ui.click == true){
@@ -39,8 +38,10 @@ function button(x, y, width, height, text, textOffset, font, centered){
     }
   }
 
+  uCtx.strokeRect(x, y, width, height);
+
   // Draw text
-  uCtx.fillStyle = "rgb(80, 80, 80)";
+  uCtx.fillStyle = "rgb(100, 100, 100)";
   uCtx.fillText(text, textX, textY);
 
   if (clicked == true){
@@ -89,6 +90,10 @@ function UI(){
 
   this.diedScreenUp = false;
   this.pauseScreenUp = false;
+  this.chatUp = true;
+
+  // Pushes debug screen over
+  this.chatWidth;
 
   this.mouseWx;
   this.mouseWy;
@@ -99,6 +104,8 @@ function UI(){
     // Get the world coordinates of the mouse
     this.mouseWx = Math.floor(world.canvasTopX + this.mouseX);
     this.mouseWy = Math.floor(world.canvasTopY + this.mouseY);
+
+    this.chat();
 
     switch (world.mode){
       case 0:
@@ -157,11 +164,12 @@ function UI(){
 
     y = windowHeight - 70;
 
-    x = 10;
+    x = this.chatWidth + 10;
 
     uCtx.fillText("FPS " + fps, x, y);
     uCtx.fillText("X " + Math.floor(player.x) + ", sX " + player.screenX + ", mX " + this.mouseWx + ", mSx " + this.mouseX, x, y + (space * 1));
     uCtx.fillText("Y " + Math.floor(player.y) + ", sY " + player.screenY + ", mY" + this.mouseWy + ", mSy " + this.mouseY, x, y + (space * 2));
+    uCtx.fillText(player.username, x, y + (space * 3));
   }
 
   UI.prototype.pauseButton = function(){
@@ -230,6 +238,16 @@ function UI(){
     uCtx.fillStyle = "rgb(230, 230, 230)";
     uCtx.fillRect(bgX, bgY, bgWidth, bgHeight);
     uCtx.strokeRect(bgX, bgY, bgWidth, bgHeight);
+
+    // Menu Label
+    uCtx.font = "80px Arial";
+    menuText = "Menu";
+    menuWidth = uCtx.measureText(menuText).width;
+    menuX = Math.floor(windowWidth / 2 - menuWidth / 2);
+    menuY = bgY + 150;
+
+    uCtx.fillStyle = "rgb(100, 100, 100)";
+    uCtx.fillText(menuText, menuX, menuY);
 
     // ----------- Close Button
     closeX = bgX + 30;
@@ -435,14 +453,33 @@ function UI(){
       uCtx.lineWidth = 2;
       uCtx.strokeRect(playerX, playerY, playerWidth, playerHeight);
 
-      // Username
+      // Username and stats
       userX = playerX + 15;
       userY = playerY + 27;
       userText = user.username;
 
+      stats = " | Wins " + user.gameWins + " Kills " + user.gameKills;
+
+      kdRatio = Math.round((user.gameKills / user.gameDeaths) * 10) / 10;
+      accuracy = Math.round((user.gameHits / user.gameShots) * 100);
+
+      if (isNaN(kdRatio) == false){
+        stats = stats + " K/D " + kdRatio;
+      }
+
+      if (isNaN(accuracy) == false){
+        stats = stats + " Accuracy " + accuracy + "%";
+      }
+
       uCtx.fillStyle = "black";
       uCtx.font = "20px Arial";
-      uCtx.fillText(userText, userX, userY);
+
+      if (uCtx.measureText(userText + stats).width < playerWidth - 20){
+        uCtx.fillText(userText + stats, userX, userY);
+      }else{
+        uCtx.fillText(userText, userX, userY);
+      }
+      
 
       if (user.host == true){
         star(playerX - 27, playerY + 20, 5, 15, 7, uCtx);
@@ -630,6 +667,110 @@ function UI(){
 
       if (clicked == true){
         socket.emit('start game');
+      }
+    }
+  }
+
+  UI.prototype.chat = function(){
+    
+
+    if (this.chatUp == false){
+      chatText = "Chat";
+      chatX = 20;
+      chatY = windowHeight - 60;
+      chatHeight = 40;
+      chatWidth = 60;
+      clicked = button(chatX, chatY, chatWidth, chatHeight, chatText, 26, 20, false);
+
+      this.chatWidth = chatWidth + 20;
+
+      if (clicked == true){
+        this.chatUp = true;
+      }
+    }else{
+      // Box
+      boxWidth = 400;
+      boxHeight = 175;
+
+      this.chatWidth = boxWidth;
+
+      boxX = 0;
+      boxY = windowHeight - boxHeight;
+
+      uCtx.fillStyle = "rgb(230, 230, 230)";
+      uCtx.fillRect(boxX + 1, boxY - 1 , boxWidth, boxHeight);
+
+      uCtx.strokeStyle = "rgb(135, 135, 135)";
+      uCtx.lineWidth = 2;
+      uCtx.strokeRect(boxX + 1, boxY - 1, boxWidth, boxHeight);
+
+      // Button
+      chatText = "Chat";
+      chatX = 5;
+      chatY = windowHeight - 45;
+      chatHeight = 40;
+      chatWidth = 60;
+      clicked = button(chatX, chatY, chatWidth, chatHeight, chatText, 26, 20, false);
+
+      this.chatWidth = boxWidth;
+
+      if (clicked == true){
+        // Unhighlights button
+        this.mouseX = 0;
+        this.mouseY = 0;
+
+        player.newMessage();
+      }
+
+      // Close Button
+      closeX = boxWidth - 35;
+      closeY = windowHeight - 35;
+      closeWidth = 20;
+      closeHeight = 20;
+      closeRadius = 17;
+
+      dist = findDistance(ui.mouseX - (closeX + (closeWidth / 2)), ui.mouseY - (closeY + (closeHeight / 2)))
+      
+      // If button is hovered on and clicked
+      if (dist < closeRadius){
+        uCtx.fillStyle = "rgb(170, 170, 170)";
+        uCtx.beginPath();
+        uCtx.arc(closeX + (closeWidth / 2), closeY + (closeHeight / 2), closeRadius, 0, 2 * Math.PI);
+        uCtx.fill();
+
+        if (ui.click == true){
+          this.chatUp = false;
+        }
+      }
+
+      uCtx.beginPath();
+      uCtx.moveTo(closeX, closeY);
+      uCtx.lineTo(closeX + closeWidth, closeY + closeHeight);
+      uCtx.stroke();
+
+      uCtx.beginPath();
+      uCtx.moveTo(closeX + closeWidth, closeY);
+      uCtx.lineTo(closeX, closeY + closeHeight);
+      uCtx.stroke();
+
+      uCtx.font = "15px Arial";
+      uCtx.fillStyle = "rgb(60, 60, 60)";
+      textX = 8;
+      textY = windowHeight - 55;
+
+      it = 0;
+
+      for (x = world.chat.length - 1; x >= 0; x -= 1){
+
+        msgY = textY - (it * 16);
+
+        if (msgY < boxY + 20){
+          break;
+        }
+
+        uCtx.fillText(world.chat[x], textX, msgY);
+
+        it += 1;
       }
     }
   }
