@@ -201,8 +201,8 @@ function Title(){
     uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
 
-    // Loses
-    text = "Loses";
+    // Losses
+    text = "Losses";
     textX = x + 80;
     textY = lineY + 85;
     uCtx.font = "20px Arial";

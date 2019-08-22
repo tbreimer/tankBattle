@@ -1180,6 +1180,9 @@ function set(key){
     case 83: // S
       player.movement.down = true;
       break;
+    case 32:
+      player.fire();
+      break;
   }
 }
 

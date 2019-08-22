@@ -2,13 +2,8 @@
 This repository tracks the development an online multiplayer tank battle game using Node.js
 An example can be found here: https://battle-tank.herokuapp.com/
 
-### v1.0
-* Chat (Server says who kills who in chat)
-* Commands
-* Show current stats in lobby
-* Stats page (kill/death, accuracy, wins)
-* Fleshed-out UI
-* Credits page
+### v1.1
+* Spacebar shoots
 
 ### Bugs
 * Players don't change position immediately when starting a game
@@ -16,11 +11,15 @@ An example can be found here: https://battle-tank.herokuapp.com/
 
 ## Planned
 
-### v1.0
-* Title Background
+### 1.1
+* Option to have bullets bounce off of walls
+* Arrow keys move tank
+* New Maps (Including one wide opne without any barriers), (Map Editor?)
+* Sort Players by Wins in Lobby 
 
 ### Future
 * Powerups
+
 
 
 
