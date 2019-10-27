@@ -1,4 +1,4 @@
-function Maps(){
+function Maps(){ 
   this.index = [new TinyIsland(), new Duel, new BattleGrounds, new ArchipelagoAssault];
 }
 

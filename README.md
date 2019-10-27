@@ -1,24 +1,30 @@
-# Tank Battle
+# Tank Battle 
 This repository tracks the development an online multiplayer tank battle game using Node.js
 An example can be found here: https://battle-tank.herokuapp.com/
 
 ### Bugs
 * Players don't change position immediately when starting a game
-* Players can clip through walls in the edges
+* Players can clip through walls on the edges
+
+### 1.1
+* Spacebar shoots
+* Arrow keys can move tank
+* Tab shows players that are still alive and their health
+* Option to have bullets bounce off of walls
+* Abillity to change bullet speed
+* Rank players by wins in lobby 
+* Fixed a bug where the stats screen could go off the page on smaller screens
 
 ## Planned
 
-### 1.1
-* Option to have bullets bounce off of walls
-* Arrow keys can move tank
-* Rank players by wins in lobby 
-* Spacebar shoots
-* Tab shows players still alive
-* Health is shown for other players
-
 ### 1.2
-* New Maps (One without barriers, others)
-* Map Editor
+* Redone maps
+* New maps, including:
+* Open one with no barriers 
+* Maze
+* Small islands 
+* Huge one
+* With more structures
 
 ### 1.3
 * Teams

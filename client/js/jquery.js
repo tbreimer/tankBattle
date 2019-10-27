@@ -550,7 +550,7 @@ function UI(){
     uCtx.font = "70px Arial";
     playersText = "Lobby";
     playersWidth = uCtx.measureText(playersText).width;
-    playersX = Math.floor(windowWidth / 4 - playersWidth / 2) + 70;
+    playersX = Math.floor(windowWidth / 2 - playersWidth / 2);
     playersY = 90;
 
     uCtx.fillStyle = "rgb(50, 50, 50)";
@@ -786,7 +786,7 @@ function UI(){
     bulletsText = "Bullets";
     bulletsWidth = uCtx.measureText(bulletsText).width;
     bulletsX = (70 + windowWidth / 2 + 60) + ((windowWidth - (70 + windowWidth / 2 + 90))/ 2) - (bulletsWidth / 2);
-    bulletsY = 50;
+    bulletsY = 555;
 
     uCtx.fillStyle = "rgb(50, 50, 50)";
     uCtx.fillText(bulletsText, bulletsX, bulletsY);

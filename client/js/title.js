@@ -1,4 +1,4 @@
-
+ 
 function Title(){
   // 0: Title Screen 1: Profile and Stats 2: Credits
   this.mode = 0;
@@ -189,41 +189,42 @@ function Title(){
 
     lineY -= 20;
 
+    if (windowHeight > 800){
+        uCtx.font = "20px Arial";
+        spacing = 25;
+    }else{
+        uCtx.font = "13px Arial";
+        spacing = 15;
+    }
+
     // Wins
     text = "Wins";
     textX = x + 80;
     textY = lineY + 60;
-    uCtx.font = "20px Arial";
     uCtx.fillText(text, textX, textY);
 
     num = player.wins;
     textX = x + width - 120;
-    uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
 
     // Losses
     text = "Losses";
     textX = x + 80;
-    textY = lineY + 85;
-    uCtx.font = "20px Arial";
+    textY = lineY + 60 + spacing * 1;
     uCtx.fillText(text, textX, textY);
 
     num = player.games - player.wins;
     textX = x + width - 120;
-    uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
 
     // Games Played
     text = "Games Played";
     textX = x + 80;
-    textY = lineY + 110;
-    uCtx.font = "20px Arial";
+    textY = lineY + 60 + spacing * 2;
     uCtx.fillText(text, textX, textY);
 
     num = player.games;
     textX = x + width - 120;
-    textY = lineY + 110;
-    uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
 
 
@@ -232,32 +233,27 @@ function Title(){
     // Kills
     text = "Kills";
     textX = x + 80;
-    textY = lineY + 150;
-    uCtx.font = "20px Arial";
+    textY = lineY + 60 + spacing * 4;
     uCtx.fillText(text, textX, textY);
 
     num = player.kills;
     textX = x + width - 120;
-    uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
 
     // Deaths
     text = "Deaths";
     textX = x + 80;
-    textY = lineY + 175;
-    uCtx.font = "20px Arial";
+    textY = lineY + 60 + spacing * 5;
     uCtx.fillText(text, textX, textY);
 
     num = player.deaths;
     textX = x + width - 120;
-    uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
 
     // Kill/Death Ratio
     text = "Kill / Death Ratio";
     textX = x + 80;
-    textY = lineY + 200;
-    uCtx.font = "20px Arial";
+    textY = lineY + 60 + spacing * 6;
     uCtx.fillText(text, textX, textY);
 
     num = Math.round((player.kills / player.deaths) * 100) / 100;
@@ -267,7 +263,6 @@ function Title(){
     }
 
     textX = x + width - 120;
-    uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
 
 
@@ -276,44 +271,37 @@ function Title(){
     // Hits
     text = "Hits";
     textX = x + 80;
-    textY = lineY + 240;
-    uCtx.font = "20px Arial";
+    textY = lineY + 60 + spacing * 8;
     uCtx.fillText(text, textX, textY);
 
     num = player.hits;
     textX = x + width - 120;
-    uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
 
     // Misses
     text = "Misses";
     textX = x + 80;
-    textY = lineY + 265;
-    uCtx.font = "20px Arial";
+    textY = lineY + 60 + spacing * 9;
     uCtx.fillText(text, textX, textY);
 
     num = player.shots - player.hits;
     textX = x + width - 120;
-    uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
 
     // Shots Fired
     text = "Shots Fired";
     textX = x + 80;
-    textY = lineY + 290;
-    uCtx.font = "20px Arial";
+    textY = lineY + 60 + spacing * 10;
     uCtx.fillText(text, textX, textY);
 
     num = player.shots;
     textX = x + width - 120;
-    uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
 
     // Accuracy
     text = "Accuracy";
     textX = x + 80;
-    textY = lineY + 315;
-    uCtx.font = "20px Arial";
+    textY = lineY + 60 + spacing * 11;
     uCtx.fillText(text, textX, textY);
 
     num = Math.round((player.hits / player.shots) * 1000) / 10;
@@ -325,7 +313,6 @@ function Title(){
     }
 
     textX = x + width - 120;
-    uCtx.font = "20px Arial";
     uCtx.fillText(num, textX, textY);
   }
 

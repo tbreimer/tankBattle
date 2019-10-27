@@ -1,8 +1,10 @@
-// Dependencies
+// Dependencies 
 var express = require('express');
 var http = require('http');
 var path = require('path');
 var socketIO = require('socket.io');
+
+
 
 // Get map data
 var fs = require('fs');
@@ -77,6 +79,9 @@ function Game(){
   this.mapIndex = 1;
 
   this.startingHealth = 30;
+
+  this.bulletBounces = 0;
+  this.bulletSpeed = 13;
   
   this.players = {};
   this.bullets = [];
@@ -117,65 +122,67 @@ function Game(){
       for (var id in game.players) {
         user = game.players[id];
         
-        if (bullet.owner != id && user.dead == false){
-          // Approximates tank collision with 3 circles
+        if (user.dead == false){
+          if (bullet.owner != id || bullet.bounces > 0){
+            // Approximates tank collision with 3 circles
 
-          // Collision with bullet
+            // Collision with bullet
 
-          // Get midpoint of bottom and top edge of tank
-          tmX = (user.tl.x + user.tr.x) / 2;
-          tmY = (user.tl.y + user.tr.y) / 2;
+            // Get midpoint of bottom and top edge of tank
+            tmX = (user.tl.x + user.tr.x) / 2;
+            tmY = (user.tl.y + user.tr.y) / 2;
 
-          bmX = (user.bl.x + user.br.x) / 2;
-          bmY = (user.bl.y + user.br.y) / 2;
+            bmX = (user.bl.x + user.br.x) / 2;
+            bmY = (user.bl.y + user.br.y) / 2;
 
-          // Midpoint of each midpoint from before and midpoint of tank
-          tmX = (tmX + user.midX) / 2;
-          tmY = (tmY + user.midY) / 2;
+            // Midpoint of each midpoint from before and midpoint of tank
+            tmX = (tmX + user.midX) / 2;
+            tmY = (tmY + user.midY) / 2;
 
-          bmX = (bmX + user.midX) / 2;
-          bmY = (bmY + user.midY) / 2;
+            bmX = (bmX + user.midX) / 2;
+            bmY = (bmY + user.midY) / 2;
 
-          radius = (user.width / 2) + 5;
-          collision = false;
+            radius = (user.width / 2) + 5;
+            collision = false;
 
-          // Top circle
-          dist = findDistance(bullet.x - tmX, bullet.y - tmY);
-        
-          if (dist < radius){
-            collision = true;
-          }
-
-          // Bottom circle
-          dist = findDistance(bullet.x - bmX, bullet.y - bmY);
+            // Top circle
+            dist = findDistance(bullet.x - tmX, bullet.y - tmY);
           
-          if (dist < radius){
-            collision = true;
-          }
-
-          // Mid circle
-          dist = findDistance(bullet.x - user.midX, bullet.y - user.midY);
-          
-          if (dist < radius){
-            collision = true;
-          }
-
-          if (collision == true){
-            this.bullets.splice(x, 1);
-            io.to(id).emit('hit by bullet');
-            io.sockets.emit('explosion', bullet.x, bullet.y, "small");
-
-            io.to(bullet.owner).emit('hit'); // For stats
-            
-            if (user.health <= 10){
-              died = user.username;
-              killed = this.players[bullet.owner].username;
-
-              io.to(bullet.owner).emit('kill');
-
-              this.newMessage(died + " was killed by " + killed);
+            if (dist < radius){
+              collision = true;
             }
 
+            // Bottom circle
+            dist = findDistance(bullet.x - bmX, bullet.y - bmY);
+            
+            if (dist < radius){
+              collision = true;
+            }
+
+            // Mid circle
+            dist = findDistance(bullet.x - user.midX, bullet.y - user.midY);
+            
+            if (dist < radius){
+              collision = true;
+            }
+
+            if (collision == true){
+              this.bullets.splice(x, 1);
+              io.to(id).emit('hit by bullet');
+              io.sockets.emit('explosion', bullet.x, bullet.y, "small");
+
+              io.to(bullet.owner).emit('hit'); // For stats
+              
+              if (user.health <= 10){
+                died = user.username;
+                killed = this.players[bullet.owner].username;
+
+                io.to(bullet.owner).emit('kill');
+
+                this.newMessage(died + " was killed by " + killed);
+              }
+
+            }
           }
         }
       }
@@ -183,18 +190,44 @@ function Game(){
       
       map = this.maps.index[this.mapIndex];
 
+      // Loop through walls
+
       for (var y = 0; y < map.walls.length; y++){
         wall = map.walls[y];
 
+        // Test if there is collision with wall
+
         if (bullet.x > wall.x && bullet.x < wall.x + wall.width){
           if (bullet.y > wall.y && bullet.y < wall.y + wall.height){
-            this.bullets.splice(x, 1);
-            io.sockets.emit('explosion', bullet.x, bullet.y, "small");
+
+            // See if bullet can bounce
+
+            if (bullet.bouncesRemaining < 1){
+              this.bullets.splice(x, 1);
+              io.sockets.emit('explosion', bullet.x, bullet.y, "small");
+            }else{
+
+              // Test if backing up the x component would stop this collision
+
+              testX = bullet.x - bullet.cX;
+
+              if (testX > wall.x && testX < wall.x + wall.width && bullet.y > wall.y && bullet.y < wall.y + wall.height){
+                // If so, reverse the y direction
+                bullet.cY = -bullet.cY;
+              }else{
+                // If not, reverse the x direction
+                bullet.cX = -bullet.cX;
+              }
+
+              bullet.bouncesRemaining -= 1;
+              bullet.bounces += 1;
+            }
+
+            
           }
         }
 
       }
-
     }
   }
 
@@ -323,7 +356,7 @@ function Game(){
   }
 }
 
-function Bullet(x, y, targetX, targetY, rotation, cX, cY, owner){
+function Bullet(x, y, targetX, targetY, rotation, cX, cY, owner, bouncesRemaining){
   this.x = x;
   this.y = y;
   this.targetX = targetX;
@@ -334,6 +367,8 @@ function Bullet(x, y, targetX, targetY, rotation, cX, cY, owner){
   this.width = 10;
   this.height = 12;
   this.owner = owner;
+  this.bouncesRemaining = bouncesRemaining;
+  this.bounces = 0;
 }
 
 function communication(socket){
@@ -469,8 +504,8 @@ function communication(socket){
     player.gameGames = data.gameGames;
   });
 
-  socket.on('fire', function(x, y, endX, endY, rotation, cX, cY, owner) {
-    game.bullets.push(new Bullet(x, y, endX, endY, rotation, cX, cY, owner));
+  socket.on('fire', function(x, y, endX, endY, rotation, cX, cY, owner, bouncesRemaining) {
+    game.bullets.push(new Bullet(x, y, endX, endY, rotation, cX, cY, owner, bouncesRemaining));
   });
 
   socket.on('change host', function() {
@@ -491,6 +526,14 @@ function communication(socket){
   socket.on('change starting health', function(value) {
     game.startingHealth = value;
     io.sockets.emit('starting health changed', value);
+  });
+
+  socket.on('change bullet bounces', function(value) {
+    game.bulletBounces = value;
+  });
+
+  socket.on('change bullet speed', function(value) {
+    game.bulletSpeed = value;
   });
 
   socket.on('new message', function(message) {

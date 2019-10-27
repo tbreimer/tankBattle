@@ -128,6 +128,8 @@ function updateGame(data){
 
   world.mapIndex = data.mapIndex;
   player.maxHealth = data.startingHealth;
+  world.bulletBounces = data.bulletBounces;
+  world.bulletSpeed = data.bulletSpeed;
 
   world.chat = data.chat;
 
@@ -278,6 +280,10 @@ function World(){
   this.bullets = [];
   this.bulletSpeed = 13;
   this.bulletDamage = 10;
+  this.bulletBounces = 0;
+
+  this.bounceList = [0, 1, 2, 5, 10];
+  this.speedList = [7, 13, 19, 25];
 
   this.explosions = [];
 
@@ -449,6 +455,31 @@ function World(){
 
   World.prototype.changeStartingHealth = function(value){
     socket.emit('change starting health', value);
+  }
+
+  World.prototype.cycleBounces = function(){
+    index = this.bounceList.indexOf(this.bulletBounces);
+
+    if (index + 1 == this.bounceList.length){
+      newValue = this.bounceList[0];
+    }else{
+      newValue = this.bounceList[index + 1];
+    }
+
+    socket.emit('change bullet bounces', newValue);
+  }
+
+  World.prototype.cycleBulletSpeed = function(){
+    index = this.speedList.indexOf(this.bulletSpeed);
+
+
+    if (index + 1 == this.speedList.length){
+      newValue = this.speedList[0];
+    }else{
+      newValue = this.speedList[index + 1];
+    }
+
+    socket.emit('change bullet speed', newValue);
   }
 }
 
@@ -877,7 +908,7 @@ function Player(){
       }
 
       degrees = calcAngleDegrees(player.midX - targetX, player.midY - targetY) - 90;
-      socket.emit('fire', player.midX, player.midY, ui.mouseX, ui.mouseY, degrees, cX, cY, this.socketID);
+      socket.emit('fire', player.midX, player.midY, ui.mouseX, ui.mouseY, degrees, cX, cY, this.socketID, world.bulletBounces);
     }
   }
 
@@ -1183,6 +1214,21 @@ function set(key){
     case 32:
       player.fire();
       break;
+    case 37: // Left
+      player.movement.left = true;
+      break;
+    case 38: // Up
+      player.movement.up = true;
+      break;
+    case 39: // Right
+      player.movement.right = true;
+      break;
+    case 40: // Down
+      player.movement.down = true;
+      break;
+    case 9:
+      ui.tabUp = true;
+      break;
   }
 }
 
@@ -1200,6 +1246,20 @@ function unSet(key){
     case 83: // S
       player.movement.down = false;
       break;
+    case 37: // Left
+      player.movement.left = false;
+      break;
+    case 38: // Up
+      player.movement.up = false;
+      break;
+    case 39: // Right
+      player.movement.right = false;
+      break;
+    case 40: // Down
+      player.movement.down = false;
+      break;
+    case 9:
+      ui.tabUp = false;
   }
 }
 
