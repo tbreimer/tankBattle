@@ -408,6 +408,21 @@ function World(){
 
         }
 
+        // Text
+        if (map.text != undefined){
+          for (var x = 0; x < map.text.length; x++){
+            text = map.text[x];
+
+            screenX = Math.round(text.x - player.x + (windowWidth / 2));
+            screenY = Math.round(text.y - player.y + (windowHeight / 2));
+
+            bCtx.fillStyle = text.color;
+            bCtx.font = text.font;
+            bCtx.fillText(text.text, screenX, screenY);
+
+          }
+        }
+
         // Explosions
 
         for (var x = 0; x < this.explosions.length; x++){

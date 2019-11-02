@@ -6,19 +6,12 @@ An example can be found here: https://battle-tank.herokuapp.com/
 * Players don't change position immediately when starting a game
 * Players can clip through walls on the edges
 
-### 1.1
-* Spacebar shoots
-* Arrow keys can move tank
-* Tab shows players that are still alive and their health
-* Option to have bullets bounce off of walls
-* Abillity to change bullet speed
-* Rank players by wins in lobby 
-* Fixed a bug where the stats screen could go off the page on smaller screens
+### 1.2
+* Redone maps
 
 ## Planned
 
 ### 1.2
-* Redone maps
 * New maps, including:
 * Open one with no barriers 
 * Maze

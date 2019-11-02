@@ -1,194 +1,20 @@
+var tinyIsland = {"name":"Tiny Island","size":"Tiny","walls":[{"x":1480,"y":200,"width":40,"height":600,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1200,"y":480,"width":600,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4}],"text":[],"islands":[{"x":1000,"y":0,"width":1000,"height":1000,"color":"rgb(45, 172, 32)","strokeColor":"rgb(41, 155, 29)","stroke":4}],"spawnZones":[{"x":1050,"y":50,"width":390,"height":390},{"x":1560,"y":50,"width":390,"height":390},{"x":1050,"y":550,"width":400,"height":410},{"x":1560,"y":560,"width":400,"height":400}],"width":5000,"height":5000,"background":"rgb(9, 133, 234)","island":true};
+
+var battleGrounds = {"name":"Battle Grounds","size":"Medium","width":1400,"height":2100,"background":"rgb(230, 230, 230)","island":false,"walls":[{"x":500,"y":0,"width":1310,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":1800,"y":0,"width":35,"height":500,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":1100,"y":465,"width":710,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":500,"y":0,"width":35,"height":810,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":-75,"y":800,"width":610,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":-75,"y":800,"width":35,"height":1000,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":-75,"y":1775,"width":310,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":200,"y":1775,"width":400,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":600,"y":1775,"width":35,"height":600,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":600,"y":2350,"width":1300,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":1890,"y":1785,"width":35,"height":600,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":1890,"y":1785,"width":600,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":2455,"y":800,"width":35,"height":1000,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":1100,"y":800,"width":1380,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":1100,"y":490,"width":35,"height":320,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":1100,"y":490,"width":35,"height":320,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":650,"y":400,"width":250,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":900,"y":185,"width":35,"height":250,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":400,"y":950,"width":35,"height":300,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":400,"y":1350,"width":35,"height":300,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":2000,"y":1000,"width":460,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":2000,"y":1000,"width":35,"height":225,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":2000,"y":1550,"width":460,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":2000,"y":1350,"width":35,"height":225,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":600,"y":1900,"width":900,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4},{"x":1000,"y":2100,"width":900,"height":35,"color":"rgb(160, 160, 160)","strokeColor":"rgb(114, 114, 114)","stroke":4}],"spawnZones":[{"x":600,"y":100,"width":600,"height":100},{"x":20,"y":900,"width":2330,"height":800},{"x":700,"y":1700,"width":1000,"height":500}]};
+
+var duelIslands = {"name":"Duel Islands","size":"Small","walls":[{"x":2400,"y":2200,"width":50,"height":200,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2400,"y":2600,"width":50,"height":200,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2600,"y":2800,"width":300,"height":50,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3100,"y":2200,"width":50,"height":600,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1700,"y":2600,"width":700,"height":60,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1700,"y":2000,"width":50,"height":400,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1900,"y":2100,"width":50,"height":400,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3150,"y":2450,"width":900,"height":100,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":4000,"y":2550,"width":50,"height":450,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3000,"y":3000,"width":1050,"height":60,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3500,"y":2650,"width":50,"height":250,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3700,"y":2850,"width":50,"height":150,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3700,"y":2550,"width":50,"height":150,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3150,"y":2750,"width":200,"height":50,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":4000,"y":1950,"width":50,"height":500,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3700,"y":1950,"width":60,"height":500,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4}],"text":[],"islands":[{"x":1500,"y":2000,"width":1000,"height":1000,"color":"rgb(45, 172, 32)","strokeColor":"rgb(41, 155, 29)","stroke":4},{"x":3000,"y":2000,"width":1000,"height":1000,"color":"rgb(45, 172, 32)","strokeColor":"rgb(41, 155, 29)","stroke":4},{"x":2500,"y":2850,"width":500,"height":100,"color":"#2F4F4F","strokeColor":"black","stroke":4},{"x":2500,"y":2050,"width":500,"height":100,"color":"#2F4F4F","strokeColor":"black","stroke":4}],"spawnZones":[{"x":1500,"y":2000,"width":1000,"height":1000},{"x":3000,"y":2000,"width":1050,"height":1060}],"width":5000,"height":5000,"background":"#00BFFF","island":true};
+;
+
+var sandyBeach = {"name":"Sandy Beach","size":"Medium","walls":[{"x":1900,"y":980,"width":300,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1600,"y":780,"width":100,"height":20,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1780,"y":600,"width":20,"height":100,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":400,"y":600,"width":700,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":400,"y":600,"width":40,"height":1100,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":600,"y":900,"width":400,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":600,"y":900,"width":40,"height":500,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":600,"y":1360,"width":400,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":960,"y":1200,"width":40,"height":200,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":960,"y":900,"width":40,"height":100,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1060,"y":1500,"width":40,"height":200,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1060,"y":600,"width":40,"height":200,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":780,"y":1050,"width":40,"height":200,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1700,"y":1460,"width":200,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1780,"y":1500,"width":40,"height":100,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1360,"y":900,"width":40,"height":300,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":400,"y":1660,"width":700,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":400,"y":1700,"width":40,"height":400,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":400,"y":2100,"width":1100,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1060,"y":1800,"width":40,"height":200,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":800,"y":1700,"width":40,"height":140,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":800,"y":1960,"width":40,"height":180,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1360,"y":1660,"width":40,"height":80,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1360,"y":1700,"width":140,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1300,"y":1660,"width":100,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1460,"y":1950,"width":40,"height":190,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4}],"text":[],"islands":[{"x":400,"y":600,"width":700,"height":1100,"color":"rgb(45, 172, 32)","strokeColor":"rgb(41, 155, 29)","stroke":4},{"x":1100,"y":600,"width":300,"height":1100,"color":"#FAFAD2","strokeColor":"#F0E68C","stroke":4},{"x":1600,"y":600,"width":200,"height":200,"color":"#FAFAD2","strokeColor":"#F0E68C","stroke":4},{"x":1400,"y":1200,"width":100,"height":300,"color":"#FAFAD2","strokeColor":"#F0E68C","stroke":4},{"x":1400,"y":600,"width":100,"height":300,"color":"#FAFAD2","strokeColor":"#F0E68C","stroke":4},{"x":1600,"y":1300,"width":400,"height":400,"color":"#FAFAD2","strokeColor":"#F0E68C","stroke":4},{"x":1800,"y":900,"width":500,"height":200,"color":"#FAFAD2","strokeColor":"#F0E68C","stroke":4},{"x":2100,"y":410,"width":200,"height":190,"color":"#FAFAD2","strokeColor":"#F0E68C","stroke":4},{"x":1500,"y":1300,"width":100,"height":100,"color":"#2F4F4F","strokeColor":"black","stroke":4},{"x":1900,"y":1100,"width":100,"height":200,"color":"#2F4F4F","strokeColor":"black","stroke":4},{"x":1500,"y":600,"width":100,"height":100,"color":"#2F4F4F","strokeColor":"black","stroke":4},{"x":400,"y":1690,"width":700,"height":410,"color":"rgb(45, 172, 32)","strokeColor":"rgb(41, 155, 29)","stroke":4},{"x":1100,"y":1700,"width":400,"height":410,"color":"#FAFAD2","strokeColor":"#F0E68C","stroke":4}],"spawnZones":[{"x":400,"y":600,"width":700,"height":400},{"x":400,"y":1030,"width":700,"height":530},{"x":400,"y":1600,"width":700,"height":540},{"x":1120,"y":600,"width":280,"height":900},{"x":1130,"y":1540,"width":270,"height":590},{"x":1600,"y":1290,"width":400,"height":410},{"x":1800,"y":900,"width":500,"height":200},{"x":1600,"y":600,"width":200,"height":200},{"x":2100,"y":410,"width":200,"height":190}],"width":5000,"height":5000,"background":"#00BFFF","island":true};
+
+
+var abyss = {"name":"ABYSS","size":"Huge","walls":[{"x":1500,"y":0,"width":50,"height":1500,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1500,"y":0,"width":2500,"height":50,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1500,"y":1700,"width":1500,"height":50,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2950,"y":1000,"width":50,"height":750,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2950,"y":1000,"width":1050,"height":50,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3950,"y":1000,"width":50,"height":750,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3950,"y":1700,"width":1000,"height":50,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":4900,"y":400,"width":50,"height":1350,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":4000,"y":400,"width":950,"height":50,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":4000,"y":0,"width":50,"height":450,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1450,"y":1700,"width":50,"height":800,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1000,"y":2450,"width":500,"height":50,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1000,"y":1500,"width":50,"height":1000,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1000,"y":1450,"width":550,"height":50,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1120,"y":1720,"width":360,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1040,"y":1840,"width":320,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1120,"y":1960,"width":360,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1040,"y":2080,"width":360,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1120,"y":2200,"width":360,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1190,"y":2280,"width":230,"height":120,"color":"blue","strokeColor":"red","stroke":4},{"x":2000,"y":50,"width":40,"height":250,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2000,"y":500,"width":40,"height":200,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1650,"y":270,"width":250,"height":30,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2300,"y":670,"width":700,"height":30,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2950,"y":850,"width":50,"height":150,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2300,"y":700,"width":40,"height":600,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2300,"y":1500,"width":40,"height":210,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2550,"y":1270,"width":410,"height":30,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2550,"y":1400,"width":40,"height":160,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2550,"y":1540,"width":40,"height":60,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1640,"y":1300,"width":40,"height":400,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":1550,"y":1160,"width":650,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2040,"y":270,"width":360,"height":30,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2600,"y":270,"width":400,"height":30,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":2960,"y":40,"width":40,"height":260,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3200,"y":410,"width":700,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":3200,"y":260,"width":700,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":4100,"y":450,"width":50,"height":350,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":4300,"y":1000,"width":50,"height":500,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":4600,"y":570,"width":300,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4},{"x":4340,"y":1000,"width":360,"height":40,"color":"rgb(160, 160, 160)","strokeColor":"rgb(130, 130, 130)","stroke":4}],"text":[{"x":1136,"y":1747,"font":"20px Arial","color":"black","text":"Hadley's Chamber"}],"islands":[],"spawnZones":[{"x":1560,"y":90,"width":1380,"height":1600},{"x":3030,"y":100,"width":950,"height":870},{"x":4030,"y":490,"width":850,"height":1180}],"width":5000,"height":5000,"background":"black","island":false};
+
+
+
 function Maps(){ 
-  this.index = [new TinyIsland(), new Duel, new BattleGrounds, new ArchipelagoAssault];
+  this.index = [tinyIsland, duelIslands, battleGrounds, sandyBeach, abyss];
 }
-
-function TinyIsland(){
-  this.name = "Tiny Island";
-  this.size = "Small"
-
-  this.width = 1000;
-  this.height = 1000;
-
-  this.background = "rgb(9, 133, 234)";
-
-  this.walls = [
-    // Outer Box
-    new Wall(-1000, -1000, 3000, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(-1000, -1000, 35, 3000, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(2000, -1000, 35, 3000, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(-1000, 2000, 3000, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    
-    // Inner Plus
-    new Wall(490, 200, 35, 600, "rgb(160, 160, 160)", 4, "rgb(130, 130, 130)"),
-    new Wall(200, 490, 600, 35, "rgb(160, 160, 160)", 4, "rgb(130, 130, 130)")
-  ];
-
-  this.island = true;
-
-  this.islands = [
-    new Island(0, 0, 1000, 1000, "rgb(45, 172, 32)", 2, "rgb(41, 155, 29)")
-  ];
-
-  this.spawnZones = [
-    new Zone(100, 100, 900, 900)
-  ];
-};
-
-function Duel(){
-  this.name = "Duel";
-  this.size = "Small";
-
-  this.width = 2000;
-  this.height = 1000;
-
-  this.background = "rgb(230, 230, 230)";
-
-  this.island = false;
-
-  this.walls = [
-    // Outer box
-    new Wall(0, 0, 1500, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(0, 0, 35, 800, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(1465, 0, 35, 800, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(0, 765, 1500, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    // Left Area
-    new Wall(200, 0, 35, 325, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    new Wall(200, 475, 35, 325, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(400, 200, 35, 400, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    // Right Area
-    new Wall(1000, 125, 35, 200, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(1000, 475, 35, 200, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    new Wall(1275, 200, 35, 400, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-  ];
-
-  this.spawnZones = [
-    new Zone(100, 100, 1400, 700)
-  ];
-
-}
-
-function BattleGrounds(){
-  this.name = "Battle Grounds";
-  this.size = "Medium";
-
-  this.width = 1400;
-  this.height = 2100;
-
-  this.background = "rgb(230, 230, 230)";
-
-  this.island = false;
-
-  this.walls = [
-    // Outer box
-    new Wall(500, 0, 1310, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(1800, 0, 35, 500, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(1100, 465, 710, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(500, 0, 35, 810, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(-75, 800, 610, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(-75, 800, 35, 1000, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(-75, 1775, 310, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(200, 1775, 400, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(600, 1775, 35, 600, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(600, 2350, 1300, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(1890, 1785, 35, 600, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(1890, 1785, 600, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(2455, 800, 35, 1000, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(1100, 800, 1380, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(1100, 490, 35, 320, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(1100, 490, 35, 320, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    // Obstacles
-    new Wall(650, 400, 250, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(900, 185, 35, 250, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    new Wall(400, 950, 35, 300, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(400, 1350, 35, 300, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    new Wall(2000, 1000, 460, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(2000, 1000, 35, 225, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(2000, 1550, 460, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(2000, 1350, 35, 225, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    new Wall(600, 1900, 900, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(1000, 2100, 900, 35, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)")
-  ];
-
-  this.spawnZones = [
-    new Zone(600, 100, 600, 100),
-    new Zone(20, 900, 2330, 800),
-    new Zone(700, 1700, 1000, 500)
-  ];
-
-}
-
-function ArchipelagoAssault(){
-  this.name = "Archipelago Assault";
-  this.size = "Huge"
-
-  this.width = 8000;
-  this.height = 6000;
-
-  this.background = "rgb(9, 133, 234)";
-
-  this.walls = [
-    // Outer Box
-    new Wall(0, 0, 8000, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(0, 0, 30, 6000, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(8000, 0, 30, 6000, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(0, 6000, 8000, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    // Central Island
-    new Wall(4300, 3300, 30, 1200, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(4300, 3300, 500, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(5200, 3300, 500, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    new Wall(5700, 3300, 30, 1200, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(4300, 4470, 500, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(5200, 4470, 510, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    new Wall(4600, 3900, 800, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    // Upper Island
-    new Wall(2200, 2300, 2500, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(5200, 2300, 1500, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    new Wall(3200, 1200, 30, 800, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(4400, 1200, 30, 800, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(5430, 1200, 30, 800, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(6500, 1200, 30, 800, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-
-    // Lower Island
-    new Wall(4000, 5200, 500, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)"),
-    new Wall(5500, 5200, 500, 30, "rgb(160, 160, 160)", 4, "rgb(114, 114, 114)")
-
-  ];
-
-  this.island = true;
-
-  this.islands = [
-    // Central Island
-    new Island(4000, 3000, 2000, 2000, "rgb(45, 172, 32)", 2, "rgb(41, 155, 29)"),
-
-    // Upper Island
-    new Island(2000, 1000, 5000, 1500, "rgb(45, 172, 32)", 2, "rgb(41, 155, 29)"),
-
-    // Bridge
-    new Island(4900, 2500, 100, 500, "rgb(160, 160, 160)", 2, "rgb(114, 114, 114)"),
-
-    // Lower Island
-    new Island(3000, 5100, 4000, 600, "rgb(45, 172, 32)", 2, "rgb(41, 155, 29)")
-  ];
-
-  this.spawnZones = [
-    new Zone(4000, 3000, 2000, 2000),
-    new Zone(1000, 1000, 6000, 1500),
-    new Zone(3000, 5100, 4000, 600)
-  ];
-};
 
 function Wall(x, y, width, height, color, stroke, strokeColor){
   this.x = x;
@@ -219,4 +45,12 @@ function Zone(x, y, width, height){
   this.y = y;
   this.width = width;
   this.height = height;
+}
+
+function Text(x, y, font, color, text){
+  this.x = x;
+  this.y = y;
+  this.font = font;
+  this.color = color;
+  this.text = text;
 }
