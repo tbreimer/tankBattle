@@ -1,4 +1,6 @@
 function button(x, y, width, height, text, textOffset, font, centered){ 
+
+  console.log(width + " " + text)
   
   // Text vars
   uCtx.font = font + "px Arial";
@@ -539,7 +541,7 @@ function UI(){
     backY = 50;
     backHeight = 40;
     backWidth = 100;
-    clicked = button(backX, backY, backWidth, backHeight, backText, 26, 20, false);
+    clicked = button(backX, backY, 100, backHeight, backText, 26, 20, false);
 
     if (clicked == true){
       mode = 0;
@@ -861,12 +863,12 @@ function UI(){
 
     if (player.host == true && Object.keys(world.players).length > 1){
       // Start game button
-      startText = "Start Game";
-      startX = windowWidth - 170;
-      startY = windowHeight - 90;
+      startText = "Start";
+      startX = backX;
+      startY = backY + 50;
       startHeight = 40;
       startWidth = 100;
-      clicked = button(startX, startY, startWidth, startHeight, startText, 26, 20, false);
+      clicked = button(startX, startY, 100, startHeight, startText, 26, 20, false);
 
       if (clicked == true){
         socket.emit('start game');
