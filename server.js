@@ -550,7 +550,6 @@ function communication(socket){
 
   socket.on('player died', function(socketID, x, y){
     game.players[socketID].type = 'spectator';
-    io.sockets.emit('explosion', x, y, "large");
   });
 
   socket.on('player data', function(data) {
