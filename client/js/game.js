@@ -1191,7 +1191,7 @@ function Player(){
   }
 
   Player.prototype.startReloadPowerUp = function(){
-    this.reloadTime = 3;
+    this.reloadTime = 11;
     this.reloadPowerUp = true;
     this.reloadPowerUpFrames = 1800;
   }
