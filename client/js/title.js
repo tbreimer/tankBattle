@@ -364,24 +364,41 @@ function Title(){
     uCtx.lineTo(closeX, closeY + closeHeight);
     uCtx.stroke();
 
-    // Credits
     uCtx.font = "20px Arial";
     uCtx.fillStyle = "rgb(100, 100, 100)"
-    c1Text = "All Art, Code, and Design";
+    c1Text = "Maps Watermelon, Keyboard, Battle Royale";
     c1Width = uCtx.measureText(c1Text).width;
     c1X = windowWidth / 2 - c1Width / 2;
-    c1Y = windowHeight * 0.45;
-
-    uCtx.fillText(c1Text, c1X, c1Y);
+    c1Y = windowHeight * 0.35;
 
     uCtx.font = "20px Arial";
     uCtx.fillStyle = "rgb(100, 100, 100)"
-    c2Text = "by Thomas Breimer";
+    c2Text = "Normandy, and Riot by AJ Cozzy";
     c2Width = uCtx.measureText(c2Text).width;
     c2X = windowWidth / 2 - c2Width / 2;
     c2Y = c1Y + 25;
 
+    // Credits
+    uCtx.font = "20px Arial";
+    uCtx.fillStyle = "rgb(100, 100, 100)"
+    c3Text = "Art, Code, and Design";
+    c3Width = uCtx.measureText(c3Text).width;
+    c3X = windowWidth / 2 - c3Width / 2;
+    c3Y = c2Y + 100;
+
+    uCtx.font = "20px Arial";
+    uCtx.fillStyle = "rgb(100, 100, 100)"
+    c4Text = "by Thomas Breimer";
+    c4Width = uCtx.measureText(c4Text).width;
+    c4X = windowWidth / 2 - c4Width / 2;
+    c4Y = c3Y + 25;
+
+
+    uCtx.fillText(c1Text, c1X, c1Y);
     uCtx.fillText(c2Text, c2X, c2Y);
+
+    uCtx.fillText(c3Text, c3X, c3Y);
+    uCtx.fillText(c4Text, c4X, c4Y);
 
     // ---------- YouTube Button
     yWidth = windowWidth * 0.2;

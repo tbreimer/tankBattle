@@ -76,7 +76,7 @@ function Game(){
   this.mode = 0;
 
   this.maps = new Maps();
-  this.mapIndex = 1;
+  this.mapIndex = 0;
 
   this.startingHealth = 30;
 
@@ -85,6 +85,10 @@ function Game(){
   
   this.players = {};
   this.bullets = [];
+  this.powerUps = [new PowerUp(1200, 300, "health"), new PowerUp(1700, 300, "speed"), new PowerUp(1700, 800, "reload"), new PowerUp(1500, 800, "reload"), new PowerUp(1700, 600, "speed")];
+
+  this.powerUpSetting = "None";
+  this.maxPowerUps = 0;
 
   this.chat = ["Server Started!"];
 
@@ -106,6 +110,7 @@ function Game(){
     }
 
     this.updateBullets();
+    this.updatePowerUps();
   }
 
   Game.prototype.updateBullets = function(){
@@ -169,7 +174,8 @@ function Game(){
             if (collision == true){
               this.bullets.splice(x, 1);
               io.to(id).emit('hit by bullet');
-              io.sockets.emit('explosion', bullet.x, bullet.y, "small");
+
+              io.sockets.emit('explosion', user.midX, user.midY, "large");
 
               io.to(bullet.owner).emit('hit'); // For stats
               
@@ -231,7 +237,48 @@ function Game(){
     }
   }
 
+  Game.prototype.updatePowerUps = function(){
+    for (var x = 0; x < this.powerUps.length; x++){
+      powerUp = this.powerUps[x];
+      for (var id in game.players) {
+        player = game.players[id];
+
+        distX = (player.x + 15) - powerUp.x;
+        distY = (player.y + 30) - powerUp.y;
+
+        dist = Math.sqrt((distX * distX) + (distY * distY));
+
+        if (dist < 30){
+          timeUntilNextSpawn = random(10000, 45000);
+
+          if (powerUp.type == "health" && player.health < this.startingHealth){
+            this.powerUps.splice(x, 1);
+            io.to(id).emit("health powerUp");
+
+            setTimeout(function(){ game.spawnPowerUp(); }, timeUntilNextSpawn);
+          }
+
+          if (powerUp.type == "speed"){
+            this.powerUps.splice(x, 1);
+            io.to(id).emit("speed powerUp");
+
+            setTimeout(function(){ game.spawnPowerUp(); }, timeUntilNextSpawn);
+          }
+
+           if (powerUp.type == "reload"){
+            this.powerUps.splice(x, 1);
+            io.to(id).emit("reload powerUp");
+
+            setTimeout(function(){ game.spawnPowerUp(); }, timeUntilNextSpawn);
+          }
+        }
+      }
+    }
+  }
+
   Game.prototype.start = function(){
+
+    io.sockets.emit('game was started');
 
     for (var id in game.players) {
       user = game.players[id];
@@ -242,44 +289,67 @@ function Game(){
       user.type = 'playing';
     }
 
+    this.initPowerUps();
+
     game.mode = 1;
+  }
+
+  Game.prototype.initPowerUps = function(){
+
+    this.powerUps = [];
+
+    // Count number of players
+    number = 0;
+    for (var id in game.players) {
+      user = game.players[id];
+      if (user.type == 'playing'){
+        number += 1;
+      }
+    }
+
+    if (this.powerUpSetting == "None"){
+      this.maxPowerUps = 0;
+    }else if (this.powerUpSetting == "Sparse"){
+      this.maxPowerUps = Math.ceil(number / 4);
+    }else if (this.powerUpSetting == "Normal"){
+      this.maxPowerUps = Math.ceil(number / 2);
+    }else if (this.powerUpSetting == "Abundant"){
+      this.maxPowerUps = number;
+    }
+
+    for (var x = 0; x < this.maxPowerUps; x++){
+      this.spawnPowerUp();
+    }
+  }
+
+  Game.prototype.spawnPowerUp = function(){
+
+    numberOfPowerUps = this.powerUps.length;
+
+    if (numberOfPowerUps < this.maxPowerUps){
+
+      coords = this.choosePosition();
+
+      types = ["speed", "health", "reload"];
+
+      type = types[Math.floor(Math.random() * types.length)];
+
+      this.powerUps.push(new PowerUp(coords.x, coords.y, type));
+
+    }
   }
 
   Game.prototype.choosePosition = function(){
     map = this.maps.index[this.mapIndex];
 
+    zoneIndex = random(0, map.spawnZones.length);
 
-    // Try 15 times to get a good random spawn, if that fails spawn at 100, 100
-    for (var x = 0; x < 30; x++){
-      // Choose random spawnZone and get a random coordinate inside it
-      zoneIndex = random(0, map.spawnZones.length);
+    zone = map.spawnZones[zoneIndex];
 
-      zone = map.spawnZones[zoneIndex];
+    spawnX = random(zone.x, zone.x + zone.width);
+    spawnY = random(zone.y, zone.y + zone.height);
 
-      spawnX = random(zone.x, zone.x + zone.width);
-      spawnY = random(zone.y, zone.y + zone.height);
-
-      // If player will spawn inside a wall, loops runs again and a new random coord is picked
-
-      goodSpawn = true;
-
-      for (var x = 0; x < map.walls.length; x++){
-        wall = map.walls[x];
-
-        if (spawnX + 30 > wall.x && spawnX < wall.x + wall.width){
-          if (spawnY + 60 > wall.y && spawnY < wall.y + wall.height){
-            goodSpawn = false;
-          }
-        }
-      }
-
-      if (goodSpawn == true){
-        return {x: spawnX, y: spawnY};
-      }
-    }
-
-    return {x: 100, y: 100};
-  
+    return {x: spawnX, y: spawnY};
   }
 
   Game.prototype.checkEndGame = function(){
@@ -371,6 +441,12 @@ function Bullet(x, y, targetX, targetY, rotation, cX, cY, owner, bouncesRemainin
   this.bounces = 0;
 }
 
+function PowerUp(x, y, type){
+  this.x = x;
+  this.y = y;
+  this.type = type;
+}
+
 function communication(socket){
   socket.on('new player', function(player) {
 
@@ -394,6 +470,9 @@ function communication(socket){
     if (devMode == true){
       type = 'playing';
       coords = game.choosePosition();
+      coords.x = 1600;
+      coords.y =  700;
+
       io.to(socket.id).emit('change position', coords.x, coords.y);
     }
 
@@ -410,6 +489,8 @@ function communication(socket){
       gameWins: 0,
       gameGames: 0
     };
+
+    io.sockets.emit('starting health changed', game.startingHealth);
 
     game.newMessage(player.username + " joined the game");
   });
@@ -534,6 +615,10 @@ function communication(socket){
 
   socket.on('change bullet speed', function(value) {
     game.bulletSpeed = value;
+  });
+
+  socket.on('change powerUp setting', function(value) {
+    game.powerUpSetting = value;
   });
 
   socket.on('new message', function(message) {
