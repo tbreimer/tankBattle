@@ -841,7 +841,7 @@ function Player(){
             this.rotation = 360 + this.rotation;
           }
 
-          if (ui.click == true){
+          if (ui.press == true){
             this.fire();
           }
         }

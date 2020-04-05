@@ -40,8 +40,6 @@ function init(){
 }
 
 function update(){ 
-  frame += 1;
-
   io.sockets.emit('state', game);
   game.update();
 }
@@ -51,6 +49,10 @@ function everySecond(){
   // Calculate fps
   fps = frame;
   frame = 0;
+
+  console.log("#Of Bullets: " + game.bullets.length);
+
+  console.log("FPS: " + fps);
 }
 
 function isUndefined(variable){
@@ -111,11 +113,20 @@ function Game(){
 
     this.updateBullets();
     this.updatePowerUps();
+
+    frame += 1;
   }
 
   Game.prototype.updateBullets = function(){
     for (var x = 0; x < this.bullets.length; x++){
+
       bullet = this.bullets[x];
+
+      bullet.frames += 1;
+
+      if (bullet.frames > 180){
+        this.bullets.splice(x, 1);
+      }
 
       bullet.x += bullet.cX;
       bullet.y += bullet.cY;
@@ -225,6 +236,7 @@ function Game(){
                 bullet.cX = -bullet.cX;
               }
 
+              bullet.frames = 0;
               bullet.bouncesRemaining -= 1;
               bullet.bounces += 1;
             }
@@ -439,6 +451,7 @@ function Bullet(x, y, targetX, targetY, rotation, cX, cY, owner, bouncesRemainin
   this.owner = owner;
   this.bouncesRemaining = bouncesRemaining;
   this.bounces = 0;
+  this.frames = 0;
 }
 
 function PowerUp(x, y, type){

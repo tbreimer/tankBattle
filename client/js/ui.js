@@ -152,7 +152,7 @@ function UI(){
           this.diedScreen();
         }
 
-        if (devMode == true){
+        if (devMode == true || this.devMenuUp == true){
           this.debugScreen();
         }
 
