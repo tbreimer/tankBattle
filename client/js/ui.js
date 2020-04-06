@@ -1169,6 +1169,6 @@ function UI(){
     if (clicked == true){
       this.devMenuUp = false;
     }
+
   }
 }
-

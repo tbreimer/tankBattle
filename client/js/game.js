@@ -1334,6 +1334,8 @@ function Player(){
 
 socket.on('state', function(data) {
 
+  console.log("State recieved")
+
   updateGame(data);
 
   // If in-game, check if player is host
