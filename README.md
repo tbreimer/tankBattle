@@ -5,16 +5,26 @@ An example can be found here: https://battle-tank.herokuapp.com/
 ### Bugs
 * Players don't change position immediately when starting a game
 * Players can clip through walls on the edges
-* If a spectator joins a game going on when it ends the end screen will say "You Won!"
-* Starting health sometimes doesn't update
 
-### 1.3.1
-* Fixed major performance problem
+### 1.2
+* Redone maps
 
 ## Planned
 
-### Future
+### 1.2
+* New maps, including:
+* Open one with no barriers 
+* Maze
+* Small islands 
+* Huge one
+* With more structures
 
+### 1.3
+* Teams
+* New team maps
+
+### Future
+* Powerups
 
 
 

@@ -9,7 +9,7 @@ socket.on('message', function(data) {
   console.log(data);
 });
 
-devMode = false;;
+devMode = false;
 
 function makeid() {
   var text = "";
@@ -20,10 +20,6 @@ function makeid() {
   }
 
   return text;
-}
-
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min) ) + min;
 }
 
 colors = ["Gold", "Khaki", "Coral", "darkorange", "green", "Aquamarine", "CornflowerBlue", "red", "orange", "DeepPink", "MediumSpringGreen", "MediumSeaGreen", "LightSeaGreen", "Crimson", "HotPink", "Burlywood", "Sienna", "Orchid", "SlateBlue", "SlateGray"];
@@ -134,7 +130,6 @@ function updateGame(data){
   player.maxHealth = data.startingHealth;
   world.bulletBounces = data.bulletBounces;
   world.bulletSpeed = data.bulletSpeed;
-  world.powerUpSetting = data.powerUpSetting;
 
   world.chat = data.chat;
 
@@ -145,7 +140,6 @@ function updateGame(data){
   }
 
   world.bullets = data.bullets;
-  world.powerUps = data.powerUps;
 }
 
 function changeHost(){
@@ -288,16 +282,8 @@ function World(){
   this.bulletDamage = 10;
   this.bulletBounces = 0;
 
-  this.powerUpSetting = "None";
-
-  this.powerUps = [];
-
-  this.wallHack = false;
-
   this.bounceList = [0, 1, 2, 5, 10];
   this.speedList = [7, 13, 19, 25];
-  this.healthList = [10, 20, 30, 50, 100, 200, 500];
-  this.powerUpsList = ["None", "Sparse", "Normal", "Abundant"];
 
   this.explosions = [];
 
@@ -321,8 +307,6 @@ function World(){
       // Draw Islands
 
       if (map.island == true){
-
-
         // Stroke islands
         for (var x = 0; x < map.islands.length; x++){
           island = map.islands[x];
@@ -331,14 +315,6 @@ function World(){
           screenY = island.y - player.y + (windowHeight / 2);
 
           bCtx.strokeStyle = island.strokeColor;
-          bCtx.lineWidth = island.stroke;
-
-          // If map is keyboard adjust stroke
-          if (this.maps.index[this.mapIndex].name == "Keyboard"){
-            bCtx.strokeStyle = "white";
-            bCtx.lineWidth = 5;
-          }
-
           bCtx.strokeRect(screenX, screenY, island.width, island.height);
 
         }
@@ -353,93 +329,6 @@ function World(){
           bCtx.fillStyle = island.color;
           bCtx.fillRect(screenX, screenY, island.width, island.height);
 
-        }
-      }
-
-      // PowerUps
-
-      for (var x = 0; x < this.powerUps.length; x++){
-        powerUp = this.powerUps[x];
-
-        if (powerUp.type == "health"){
-          screenX = powerUp.x - player.x + (windowWidth / 2);
-          screenY = powerUp.y - player.y + (windowHeight / 2);
-
-          pCtx.fillStyle = "white";
-          pCtx.strokeStyle = "rgb(100, 100, 100)";
-
-          pCtx.lineWidth = 2;
-          pCtx.beginPath();
-          pCtx.arc(screenX, screenY, 15, 0, 2 * Math.PI);
-          pCtx.fill();
-          pCtx.stroke();
-
-          pCtx.lineWidth = 2;
-          pCtx.strokeStyle = "red";
-          pCtx.beginPath();
-          pCtx.moveTo(screenX, screenY - 7);
-          pCtx.lineTo(screenX, screenY + 7);
-          pCtx.stroke();
-
-          pCtx.beginPath();
-          pCtx.moveTo(screenX + 7, screenY);
-          pCtx.lineTo(screenX - 7, screenY);
-          pCtx.stroke();
-        }
-
-        if (powerUp.type == "speed"){
-          screenX = powerUp.x - player.x + (windowWidth / 2);
-          screenY = powerUp.y - player.y + (windowHeight / 2);
-
-          pCtx.fillStyle = "#17c8e3";
-          pCtx.strokeStyle = "black";
-
-          pCtx.lineWidth = 2;
-          pCtx.beginPath();
-          pCtx.arc(screenX, screenY, 15, 0, 2 * Math.PI);
-          pCtx.fill();
-          pCtx.stroke();
-
-          pCtx.beginPath();
-          pCtx.moveTo(screenX - 7, screenY);
-          pCtx.lineTo(screenX, screenY - 7);
-          pCtx.lineTo(screenX + 7, screenY);
-          pCtx.stroke();
-
-          pCtx.beginPath();
-          pCtx.moveTo(screenX - 7, screenY + 7);
-          pCtx.lineTo(screenX, screenY);
-          pCtx.lineTo(screenX + 7, screenY + 7);
-          pCtx.stroke();
-        }
-
-        if (powerUp.type == "reload"){
-          screenX = powerUp.x - player.x + (windowWidth / 2);
-          screenY = powerUp.y - player.y + (windowHeight / 2);
-
-          pCtx.fillStyle = "#d63838";
-          pCtx.strokeStyle = "black";
-
-          pCtx.lineWidth = 2;
-          pCtx.beginPath();
-          pCtx.arc(screenX, screenY, 15, 0, 2 * Math.PI);
-          pCtx.fill();
-          pCtx.stroke();
-
-          pCtx.fillStyle = "black";
-          pCtx.beginPath();
-          pCtx.arc(screenX, screenY, 2.5, 0, 2 * Math.PI);
-          pCtx.fill();
-
-          pCtx.fillStyle = "black";
-          pCtx.beginPath();
-          pCtx.arc(screenX - 8, screenY, 2.5, 0, 2 * Math.PI);
-          pCtx.fill();
-
-          pCtx.fillStyle = "black";
-          pCtx.beginPath();
-          pCtx.arc(screenX + 8, screenY, 2.5, 0, 2 * Math.PI);
-          pCtx.fill();
         }
       }
 
@@ -460,135 +349,113 @@ function World(){
           pCtx.stroke();
       }
 
-      // Explosions
-
-      for (var x = 0; x < this.explosions.length; x++){
-        explosion = this.explosions[x];
-
-        screenX = explosion.x - player.x + (windowWidth / 2);
-        screenY = explosion.y - player.y + (windowHeight / 2);
-
-        pCtx.fillStyle = "orange";
-        pCtx.strokeStyle = "darkorange";
-
-        pCtx.beginPath();
-        pCtx.globalAlpha = Math.round(explosion.transparency * 100) / 100;
-        pCtx.arc(screenX, screenY, explosion.radius, 0, 2 * Math.PI);
-        pCtx.fill();
-        pCtx.stroke();
-        pCtx.globalAlpha = 1;
-
-        if (explosion.type == "small"){
-          explosion.radius += 0.5;
-          explosion.transparency -= 0.05;
-
-        }else if (explosion.type == "large"){
-          explosion.radius += 2;
-          explosion.transparency -= 0.05;
-        }
-
-        if (explosion.transparency <= 0){
-          this.explosions.splice(x, 1);
-        }
-      }
-
       // Draw other players
 
       
-      for (var id in this.players) {
-        var user = this.players[id];
+        for (var id in this.players) {
+          var user = this.players[id];
 
-        if (user.type == 'playing' && id != player.socketID){
-          screenX = user.x - player.x + (windowWidth / 2);
-          screenY = user.y - player.y + (windowHeight / 2);
+          if (user.type == 'playing' && id != player.socketID){
+            screenX = user.x - player.x + (windowWidth / 2);
+            screenY = user.y - player.y + (windowHeight / 2);
 
-          pCtx.fillStyle = user.color;
-          drawRectRot(pCtx, screenX , screenY, user.width, user.height, user.rotation);
+            pCtx.fillStyle = user.color;
+            drawRectRot(pCtx, screenX , screenY, user.width, user.height, user.rotation);
 
-          pCtx.lineWidth = 2;
-          pCtx.strokeStyle = "black";
+            pCtx.lineWidth = 2;
+            pCtx.strokeStyle = "black";
 
-          strokeRectRot(pCtx, screenX , screenY, user.width, user.height, user.rotation);
+            strokeRectRot(pCtx, screenX , screenY, user.width, user.height, user.rotation);
 
-          midX = user.x + (user.width / 2);
-          midY = user.y + (user.height / 2);
+            midX = user.x + (user.width / 2);
+            midY = user.y + (user.height / 2);
 
-          turretRot(pCtx, screenX + user.width / 2, screenY + user.height / 2, 0, 0, user.turretRot);
+            turretRot(pCtx, screenX + user.width / 2, screenY + user.height / 2, 0, 0, user.turretRot);
 
-          pCtx.font = "16px Arial";
-          pCtx.fillStyle = "black";
-          textWidth = pCtx.measureText(user.username).width;
-          pCtx.fillText(user.username, screenX - (textWidth / 2) + (player.width / 2), screenY - 20);
-        }
-      }
+            pCtx.font = "16px Arial";
+            pCtx.fillStyle = "black";
+            textWidth = pCtx.measureText(user.username).width;
+            pCtx.fillText(user.username, screenX - (textWidth / 2) + (player.width / 2), screenY - 20);
+          }
         
 
-      // Stroke Walls
-      
-      map = this.maps.index[this.mapIndex];
+        // Stroke Walls
+        
+        map = this.maps.index[this.mapIndex];
 
-      for (var x = 0; x < map.walls.length; x++){
-        wall = map.walls[x];
+        for (var x = 0; x < map.walls.length; x++){
+          wall = map.walls[x];
 
-        screenX = wall.x - player.x + (windowWidth / 2);
-        screenY = wall.y - player.y + (windowHeight / 2);
+          screenX = wall.x - player.x + (windowWidth / 2);
+          screenY = wall.y - player.y + (windowHeight / 2);
 
-        bCtx.strokeStyle = wall.strokeColor;
-        bCtx.lineWidth = wall.stroke;
-        bCtx.strokeRect(screenX, screenY, wall.width, wall.height);
+          bCtx.strokeStyle = wall.strokeColor;
+          bCtx.lineWidth = wall.stroke;
+          bCtx.strokeRect(screenX, screenY, wall.width, wall.height);
 
-      }
+        }
 
-      // Fill Walls
+        // Fill Walls
 
-      for (var x = 0; x < map.walls.length; x++){
-        wall = map.walls[x];
+        for (var x = 0; x < map.walls.length; x++){
+          wall = map.walls[x];
 
-        screenX = wall.x - player.x + (windowWidth / 2);
-        screenY = wall.y - player.y + (windowHeight / 2);
+          screenX = wall.x - player.x + (windowWidth / 2);
+          screenY = wall.y - player.y + (windowHeight / 2);
 
-        bCtx.fillStyle = wall.color;
-        bCtx.fillRect(screenX, screenY, wall.width, wall.height);
+          bCtx.fillStyle = wall.color;
+          bCtx.fillRect(screenX, screenY, wall.width, wall.height);
 
-      }
+        }
 
-      // Text
-      if (map.text != undefined){
-        for (var x = 0; x < map.text.length; x++){
-          text = map.text[x];
+        // Text
+        if (map.text != undefined){
+          for (var x = 0; x < map.text.length; x++){
+            text = map.text[x];
 
-          screenX = Math.round(text.x - player.x + (windowWidth / 2));
-          screenY = Math.round(text.y - player.y + (windowHeight / 2));
+            screenX = Math.round(text.x - player.x + (windowWidth / 2));
+            screenY = Math.round(text.y - player.y + (windowHeight / 2));
 
-          bCtx.fillStyle = text.color;
-          bCtx.font = text.font;
-          bCtx.fillText(text.text, screenX, screenY);
+            bCtx.fillStyle = text.color;
+            bCtx.font = text.font;
+            bCtx.fillText(text.text, screenX, screenY);
 
+          }
+        }
+
+        // Explosions
+
+        for (var x = 0; x < this.explosions.length; x++){
+          explosion = this.explosions[x];
+
+          screenX = explosion.x - player.x + (windowWidth / 2);
+          screenY = explosion.y - player.y + (windowHeight / 2);
+
+          pCtx.fillStyle = "orange";
+          pCtx.strokeStyle = "darkorange";
+
+          pCtx.beginPath();
+          pCtx.globalAlpha = Math.round(explosion.transparency * 100) / 100;
+          pCtx.arc(screenX, screenY, explosion.radius, 0, 2 * Math.PI);
+          pCtx.fill();
+          pCtx.stroke();
+          pCtx.globalAlpha = 1;
+
+          if (explosion.type == "small"){
+            explosion.radius += 0.5;
+            explosion.transparency -= 0.05;
+
+          }else if (explosion.type == "large"){
+            explosion.radius += 2;
+            explosion.transparency -= 0.05;
+          }
+
+          if (explosion.transparency <= 0){
+            this.explosions.splice(x, 1);
+          }
         }
       }
     }
-  }
-
-  World.prototype.randomizeSettings = function(){
-    // Bullet Bounces
-    newValue = this.bounceList[Math.floor(Math.random() * this.bounceList.length)];
-    socket.emit('change bullet bounces', newValue);
-
-    // Bullet Speed
-    newValue = this.speedList[Math.floor(Math.random() * this.speedList.length)];
-    socket.emit('change bullet speed', newValue);
-
-    // Map
-    newValue = random(0, this.maps.index.length);
-    this.changeMap(newValue);
-
-    // Health
-    newValue = this.healthList[Math.floor(Math.random() * this.healthList.length)];
-    socket.emit('change starting health', newValue);
-    
-    // PowerUps
-    newValue = this.powerUpsList[Math.floor(Math.random() * this.powerUpsList.length)];
-    socket.emit('change powerUp setting', newValue);
   }
 
   World.prototype.join = function(){
@@ -629,32 +496,6 @@ function World(){
 
     socket.emit('change bullet speed', newValue);
   }
-
-  World.prototype.cycleStartingHealth = function(){
-    index = this.healthList.indexOf(player.maxHealth);
-
-
-    if (index + 1 == this.healthList.length){
-      newValue = this.healthList[0];
-    }else{
-      newValue = this.healthList[index + 1];
-    }
-
-    socket.emit('change starting health', newValue);
-  }
-
-  World.prototype.cyclePowerUps = function(){
-    index = this.powerUpsList.indexOf(this.powerUpSetting);
-
-
-    if (index + 1 == this.powerUpsList.length){
-      newValue = this.powerUpsList[0];
-    }else{
-      newValue = this.powerUpsList[index + 1];
-    }
-
-    socket.emit('change powerUp setting', newValue);
-  }
 }
 
 function Player(){
@@ -667,26 +508,16 @@ function Player(){
   this.x = 0;
   this.y = 0;
 
-  this.inputs = true;
-
   this.screenX;
   this.screenY;
 
   this.midX; // Midpoint of tank
   this.midY;
 
-  this.speedHack = false;
-
   this.speed = 3;
 
   this.rotation = 0;
   this.rotationSpeed = 3;
-
-  this.speedPowerUp = false;
-  this.speedPowerUpFrames = 0;
-
-  this.reloadPowerUp = false;
-  this.reloadPowerUpFrames = 0;
 
   this.turretRot = 0;
 
@@ -741,134 +572,95 @@ function Player(){
 
   Player.prototype.update = function(){
 
-    this.fire();
-
     if (this.type == 'playing'){
 
-      // Freezes inputs when game starts
-      if (this.inputs == true){
+      if (ui.pauseScreenUp == false){
 
-        // Decrerase time remaining of speed power up
-
-        if (this.speedPowerUp == true){
-          this.speedPowerUpFrames -= 1;
-
-          if (this.speedPowerUpFrames <= 0){
-            this.speedPowerUp = false;
-            this.speed = 3;
-          }
+        if (this.reload > 0){
+          this.reload -= 1;
         }
 
-        if (this.reloadPowerUp == true){
-          this.reloadPowerUpFrames -= 1;
+        this.midX = this.x + (this.width / 2);
+        this.midY = this.y + (this.height / 2);
 
-          if (this.reloadPowerUpFrames <= 0){
-            this.reloadPowerUp = false;
-            this.reloadTime = 18;
-          }
+        this.tl = rotatePoint([this.midX, this.midY], [this.x, this.y], this.rotation);
+        this.tr = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y], this.rotation);
+        this.br = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y + this.height], this.rotation);
+        this.bl = rotatePoint([this.midX, this.midY], [this.x, this.y + this.height], this.rotation);
+
+        // Calcs deltaX and deltaY based on rotation and speed
+        movement = calcAngleCoords(this.rotation, this.speed);
+
+        this.wallCollision(movement);
+
+        // If map has island collision, test it
+        if (world.maps.index[world.mapIndex].island == true){
+          this.islandCollision(movement);
         }
 
+        if (this.movement.left == true && this.aCol == false){
+          this.rotation -= this.rotationSpeed;
+        }
 
-        if (ui.pauseScreenUp == false){
+        if (this.movement.right == true && this.dCol == false){
+          this.rotation += this.rotationSpeed;
+        }
 
-          if (this.reload > 0){
-            this.reload -= 1;
-          }
+        if (this.movement.up == true && this.wCol == false){
+          this.x -= movement.x;
+          this.y -= movement.y;
+        }
 
-          this.midX = this.x + (this.width / 2);
-          this.midY = this.y + (this.height / 2);
+        if (this.movement.down == true && this.sCol == false){
+          this.x += movement.x;
+          this.y += movement.y;
+        }
+        
 
-          this.tl = rotatePoint([this.midX, this.midY], [this.x, this.y], this.rotation);
-          this.tr = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y], this.rotation);
-          this.br = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y + this.height], this.rotation);
-          this.bl = rotatePoint([this.midX, this.midY], [this.x, this.y + this.height], this.rotation);
+        if (this.rotation >= 360){
+          this.rotation = this.rotation - 360;
+        }
 
-          if (this.speedHack == true){
-            this.speed = 10;
-          }
+        if (this.rotation < 0){
+          this.rotation = 360 + this.rotation;
+        }
 
-          if (this.speedPowerUp == true){
-            this.speed = 5;
-          }
+        // Recalculate vertexes based on new movement
+        this.midX = this.x + (this.width / 2);
+        this.midY = this.y + (this.height / 2);
 
-          // Calcs deltaX and deltaY based on rotation and speed
-          movement = calcAngleCoords(this.rotation, this.speed);
+        this.tl = rotatePoint([this.midX, this.midY], [this.x, this.y], this.rotation);
+        this.tr = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y], this.rotation);
+        this.br = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y + this.height], this.rotation);
+        this.bl = rotatePoint([this.midX, this.midY], [this.x, this.y + this.height], this.rotation);
 
-          if (world.wallHack == false){
-            this.wallCollision(movement);
-          }
+        this.turretRot = calcAngleDegrees((this.screenX + (this.width / 2)) - ui.mouseX, ((this.screenY + (this.height / 2)) - ui.mouseY)) - 90;
 
-          // If map has island collision, test it
-          if (world.maps.index[world.mapIndex].island == true){
-            this.islandCollision(movement);
-          }
-
-          if (this.movement.left == true && this.aCol == false){
-            this.rotation -= this.rotationSpeed;
-          }
-
-          if (this.movement.right == true && this.dCol == false){
-            this.rotation += this.rotationSpeed;
-          }
-
-          if (this.movement.up == true && this.wCol == false){
-            this.x -= movement.x;
-            this.y -= movement.y;
-          }
-
-          if (this.movement.down == true && this.sCol == false){
-            this.x += movement.x;
-            this.y += movement.y;
-          }
-          
-
-          if (this.rotation >= 360){
-            this.rotation = this.rotation - 360;
-          }
-
-          if (this.rotation < 0){
-            this.rotation = 360 + this.rotation;
-          }
-
-          if (ui.press == true){
-            this.fire();
-          }
+        if (ui.click == true){
+          this.fire();
         }
       }
-
-      // Recalculate vertexes based on new movement
-      this.midX = this.x + (this.width / 2);
-      this.midY = this.y + (this.height / 2);
-
-      this.tl = rotatePoint([this.midX, this.midY], [this.x, this.y], this.rotation);
-      this.tr = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y], this.rotation);
-      this.br = rotatePoint([this.midX, this.midY], [this.x + this.width, this.y + this.height], this.rotation);
-      this.bl = rotatePoint([this.midX, this.midY], [this.x, this.y + this.height], this.rotation);
-
-      this.turretRot = calcAngleDegrees((this.screenX + (this.width / 2)) - ui.mouseX, ((this.screenY + (this.height / 2)) - ui.mouseY)) - 90;
 
       socket.emit('player data', player);
 
       this.render();
 
     }else if (this.type == "spectator"){
-      this.speed = 3;
-
       if (ui.diedScreenUp == false){
         if (this.movement.up == true){
-          this.y -= (this.speed * 2);
+          this.y -= (this.speed * 1.5);
         }
 
         if (this.movement.down == true){
-          this.y += (this.speed * 2);
+          this.y += (this.speed * 1.5);
         }
 
         if (this.movement.left == true){
-          this.x -= (this.speed * 2);
+          this.x -= (this.speed * 1.5);
         }
 
         if (this.movement.right == true){
-          this.x += (this.speed * 2);
+          this.x += (this.speed * 1.5);
         }
       }
       
@@ -1098,12 +890,10 @@ function Player(){
   }
 
   Player.prototype.fire = function(){
-
     this.shots += 1;
     this.gameShots += 1;
 
     if (this.reload <= 0){
-
       this.reload = this.reloadTime;
 
       this.degrees = calcAngleDegrees(this.midX - this.targetX, this.midY - this.targetY) - 90;
@@ -1141,7 +931,6 @@ function Player(){
     this.health -= amount;
 
     if (this.health <= 0){
-
       this.dead = true;
       ui.diedScreenUp = true;
 
@@ -1153,41 +942,8 @@ function Player(){
       this.deaths += 1;
       this.gameDeaths += 1;
 
-      this.speedPowerUp = false;
-      this.reloadPowerUp = false;
-      this.reloadTime = 18;
-
       socket.emit("player died", this.socketID, this.midX, this.midY);
-
-      this.speed = 3;
     }
-  }
-
-  Player.prototype.healthPowerUp = function(){
-    // Called upon getting a health powerUp
-
-    healthDiff = this.maxHealth - this.health;
-
-    // Make sure that health power up doesn't make health go past max health
-
-    healthBonus = player.maxHealth / 4;
-
-    if (healthBonus + this.health > this.maxHealth){
-      this.health = this.maxHealth;
-    }else{
-      this.health += healthBonus;
-    }
-  }
-
-  Player.prototype.startReloadPowerUp = function(){
-    this.reloadTime = 11;
-    this.reloadPowerUp = true;
-    this.reloadPowerUpFrames = 1800;
-  }
-
-  Player.prototype.startSpeedPowerUp = function(){
-    this.speedPowerUp = true;
-    this.speedPowerUpFrames = 1800;
   }
 
   Player.prototype.changePosition = function(x, y){
@@ -1196,11 +952,6 @@ function Player(){
   }
 
   Player.prototype.reset = function(){
-    this.reloadTime = 18;
-    this.reloadPowerUp = false;
-    this.speedPowerUp = false;
-    this.speed = 3;
-
     this.health = this.maxHealth;
     this.dead = false;
     ui.diedScreenUp = false;
@@ -1212,8 +963,36 @@ function Player(){
   Player.prototype.newMessage = function(){
     message = prompt("Enter a message");
 
-    if (message == "/devMenu"){
-      ui.devMenuUp = true;
+    if (message == "$: host"){ // Host Command
+      socket.emit('change host');
+
+    }else if (message == "$: kick"){
+      username = prompt("Kick Who?");
+
+      for (var id in world.players) {
+        var user = world.players[id];
+
+        if (username == user.username){
+          socket.emit('kick', id);
+        }
+      }
+
+    }else if(message == "$: health"){
+      this.health = prompt("Health");
+
+    }else if(message == "$: reload"){
+      this.reloadTime = prompt("Reload");
+
+    }else if (message == "$: map"){
+      mapID = prompt("Map ID");
+
+      world.changeMap(mapID);
+
+    }else if (message == "$: tp"){
+      x = prompt("X");
+      y = prompt("Y");
+
+      this.changePosition(x, y);
 
     }else if (message != null && message != ""){
 
@@ -1336,8 +1115,6 @@ function Player(){
 
 socket.on('state', function(data) {
 
-  console.log("State recieved")
-
   updateGame(data);
 
   // If in-game, check if player is host
@@ -1368,14 +1145,9 @@ function Explosion(x, y, type){
       this.radius = 25;
       break;
   }
-}
 
-function PowerUp(x, y, type){
-  this.x = x;
-  this.y = y;
-  this.type = type;
-}
 
+}
 
 socket.on('connect', function() {
   player.socketID = socket.io.engine.id;; // Player knows its own socketID
@@ -1409,18 +1181,6 @@ socket.on('map changed', function(mapIndex){
 socket.on('starting health changed', function(value){
   player.health = value;
   player.maxHealth = value;
-});
-
-socket.on('health powerUp', function(){
-  player.healthPowerUp();
-});
-
-socket.on('speed powerUp', function(){
-  player.startSpeedPowerUp();
-});
-
-socket.on('reload powerUp', function(){
-  player.startReloadPowerUp();
 });
 
 socket.on('hit', function(value){

@@ -1,5 +1,6 @@
 function button(x, y, width, height, text, textOffset, font, centered){ 
 
+  console.log(width + " " + text)
   
   // Text vars
   uCtx.font = font + "px Arial";
@@ -89,16 +90,10 @@ function UI(){
   this.press = false;
   this.click = false;
 
-  this.devMenuUp = false;
-  this.tpNextClick = false;
-
   this.diedScreenUp = false;
   this.pauseScreenUp = false;
   this.chatUp = true;
   this.tabUp = false;
-
-  this.gameStartScreenUp = true;
-  this.gameStartFramesRemaining = 180;
 
   // Pushes debug screen over
   this.chatWidth;
@@ -123,23 +118,6 @@ function UI(){
         this.pauseButton();
         this.dataBar();
 
-        if (this.devMenuUp == true){
-          this.devMenu();
-        }
-
-        if (player.speedPowerUp == true){
-          this.speedPowerUp();
-        }
-
-        if (player.reloadPowerUp == true){
-          this.reloadPowerUp();
-        }
-
-        if (this.tpNextClick == true && this.click == true && this.mouseX > 150){
-          player.changePosition(this.mouseWx, this.mouseWy);
-          this.tpNextClick = false;
-        }
-
         if (player.type == 'spectator' && this.diedScreenUp == false){
           this.spectating();
         }
@@ -152,7 +130,7 @@ function UI(){
           this.diedScreen();
         }
 
-        if (devMode == true || this.devMenuUp == true){
+        if (devMode == true){
           this.debugScreen();
         }
 
@@ -221,62 +199,6 @@ function UI(){
       }
       
     }
-  }
-
-  UI.prototype.speedPowerUp = function(){
-    speedWidth = 30;
-    speedHeight = 150;
-
-    speedX = windowWidth - speedWidth - 10;
-    speedY = 10;
-
-    // Gray box
-    uCtx.fillStyle = "rgb(230, 230, 230)";
-    uCtx.fillRect(speedX, speedY, speedWidth, speedHeight);
-
-    uCtx.strokeStyle = "rgb(135, 135, 135)";
-    uCtx.strokeRect(speedX, speedY, speedWidth, speedHeight);
-
-    percentRemaining = player.speedPowerUpFrames / 1800;
-
-    barWidth = 20;
-    barHeight = (speedHeight - 10) * percentRemaining;
-
-    barX = speedX + 5;
-    barY = speedY + speedHeight - 5;
-
-    uCtx.fillStyle = "DeepSkyBlue";
-    uCtx.fillRect(barX, barY, barWidth, -barHeight);
-    uCtx.fillStyle = "rgb(0, 141, 188)";
-    uCtx.strokeRect(barX, barY, barWidth, -barHeight)
-  }
-
-  UI.prototype.reloadPowerUp = function(){
-    reloadWidth = 30;
-    reloadHeight = 150;
-
-    reloadX = windowWidth - reloadWidth - 10;
-    reloadY = 170;
-
-    // Gray box
-    uCtx.fillStyle = "rgb(230, 230, 230)";
-    uCtx.fillRect(reloadX, reloadY, reloadWidth, reloadHeight);
-
-    uCtx.strokeStyle = "rgb(135, 135, 135)";
-    uCtx.strokeRect(reloadX, reloadY, reloadWidth, reloadHeight);
-
-    percentRemaining = player.reloadPowerUpFrames / 1800;
-
-    barWidth = 20;
-    barHeight = (reloadHeight - 10) * percentRemaining;
-
-    barX = reloadX + 5;
-    barY = reloadY + reloadHeight - 5;
-
-    uCtx.fillStyle = "#ebb031";
-    uCtx.fillRect(barX, barY, barWidth, -barHeight);
-    uCtx.fillStyle = "#b58722";
-    uCtx.strokeRect(barX, barY, barWidth, -barHeight)
   }
 
   UI.prototype.tabBar = function(){
@@ -615,8 +537,8 @@ function UI(){
   UI.prototype.lobby = function(){
     // Back Button
     backText = "Back";
-    backX = 30;
-    backY = 30;
+    backX = 50;
+    backY = 50;
     backHeight = 40;
     backWidth = 100;
     clicked = button(backX, backY, 100, backHeight, backText, 26, 20, false);
@@ -744,8 +666,8 @@ function UI(){
     for (var x = 0; x < maps.length; x ++){
       // Outline
       mapWidth = windowWidth - (70 + windowWidth / 2 + 90);
-      mapHeight = 20;
-      mapY = x * 23 + 200;
+      mapHeight = 40;
+      mapY = x * 45 + 200;
       mapX = (70 + windowWidth / 2 + 60);
 
 
@@ -774,23 +696,23 @@ function UI(){
       uCtx.strokeRect(mapX, mapY, mapWidth, mapHeight);
 
       // Name
-      nameX = mapX + 10;
-      nameY = mapY + 15;
+      nameX = mapX + 15;
+      nameY = mapY + 27;
       nameText = maps[x].name;
 
       uCtx.fillStyle = "black";
-      uCtx.font = "15px Arial";
+      uCtx.font = "20px Arial";
       uCtx.fillText(nameText, nameX, nameY);
 
       // Size
       sizeText = maps[x].size;
       sizeWidth = uCtx.measureText(sizeText).width;
-      sizeX = mapX + mapWidth - sizeWidth - 10;
-      sizeY = mapY + 15;
+      sizeX = mapX + mapWidth - sizeWidth - 13;
+      sizeY = mapY + 27;
       
 
       uCtx.fillStyle = "black";
-      uCtx.font = "15px Arial";
+      uCtx.font = "20px Arial";
       uCtx.fillText(sizeText, sizeX, sizeY);
 
     
@@ -807,74 +729,59 @@ function UI(){
     uCtx.fillStyle = "rgb(50, 50, 50)";
     uCtx.fillText(mapText, mapX, mapY);
 
-    // Health box
+    // Health Label
+    uCtx.font = "40px Arial";
+    healthText = "Health";
+    healthWidth = uCtx.measureText(healthText).width;
+    healthX = (70 + windowWidth / 2 + 60) + ((windowWidth - (70 + windowWidth / 2 + 90))/ 2) - (healthWidth / 2);
+    healthY = 175 + (world.maps.index.length * 45) + 75;
 
-    healthBoxX = Math.floor(70 + windowWidth / 2 + 60);
-    healthBoxY = 225 + (world.maps.index.length * 23);
-    healthBoxWidth = Math.floor((windowWidth - (70 + windowWidth / 2 + 90)) / 2) - 6;
-    healthBoxHeight = 40;
+    uCtx.fillStyle = "rgb(50, 50, 50)";
+    uCtx.fillText(healthText, healthX, healthY);
 
+    healthSelectWidth = windowWidth - (70 + windowWidth / 2 + 90);
+    interval = healthSelectWidth / 5;
+    selectWidth = interval - 5;
+    selectHeight = 40;
 
-    uCtx.font = "20px Arial";
-    healthtText = "Health: " + player.maxHealth;
-    healthtWidth = uCtx.measureText(healthtText).width;
-    healthtX = healthBoxX + (healthBoxWidth / 2) - (healthtWidth / 2);
-    healthtY = healthBoxY + 27;
+    for (x = 0; x < 5; x++){
+      selectX = (70 + windowWidth / 2 + 60) + (x * interval);
+      selectY = healthY + 25;
 
-    // Select if host
-    if (player.host == true){
-      if (ui.mouseX > healthBoxX && ui.mouseX < healthBoxX + healthBoxWidth)
-        if (ui.mouseY > healthBoxY && ui.mouseY < healthBoxY + healthBoxHeight){
-          uCtx.fillStyle = "rgb(230, 230, 230)";
-          uCtx.fillRect(healthBoxX, healthBoxY, healthBoxWidth, healthBoxHeight);
+      // Select if that value is current starting health
+      if ((10 + (x * 10)) == player.maxHealth){
+        uCtx.fillStyle = "rgb(230, 230, 230)";
+        uCtx.fillRect(selectX, selectY, selectWidth, selectHeight);
+      }
 
-          if (ui.click == true){
-            world.cycleStartingHealth();
+      // Select if host
+      if (player.host == true){
+        if (ui.mouseX > selectX && ui.mouseX < selectX + selectWidth)
+          if (ui.mouseY > selectY && ui.mouseY < selectY + selectHeight){
+            uCtx.fillStyle = "rgb(230, 230, 230)";
+            uCtx.fillRect(selectX, selectY, selectWidth, selectHeight);
+
+            if (ui.click == true){
+              world.changeStartingHealth(10 + (x * 10));
+            }
           }
-        }
+      }
+
+      // Health Boxes
+      uCtx.strokeStyle = 2;
+      uCtx.strokeRect(selectX, selectY, selectWidth, selectHeight);
+
+      uCtx.fillStyle = "black";
+      uCtx.font = "20px Arial";
+
+      // Health Text
+      numberText = 10 + (x * 10);
+      numberWidth = uCtx.measureText(numberText).width;
+      numberX = selectX + (selectWidth / 2) - (numberWidth / 2);
+      numberY = selectY + 27;
+
+      uCtx.fillText(numberText, numberX, numberY);
     }
-
-    uCtx.fillStyle = "black";
-
-    uCtx.strokeStyle = 2;
-    uCtx.strokeRect(healthBoxX, healthBoxY, healthBoxWidth, healthBoxHeight);
-    uCtx.fillText(healthtText, healthtX, healthtY);
-
-    // Powerups box
-
-    powerBoxX = Math.floor(70 + windowWidth / 2 + 60 + healthBoxWidth + 10);
-    powerBoxY = 225 + (world.maps.index.length * 23);
-    powerBoxWidth = Math.floor((windowWidth - (70 + windowWidth / 2 + 90)) / 2) - 6;
-    powerBoxHeight = 40;
-
-
-    uCtx.font = "20px Arial";
-    powertText = "Power Ups: " + world.powerUpSetting;
-    powertWidth = uCtx.measureText(powertText).width;
-    powertX = powerBoxX + (powerBoxWidth / 2) - (powertWidth / 2);
-    powertY = powerBoxY + 27;
-
-    // Select if host
-    if (player.host == true){
-      if (ui.mouseX > powerBoxX && ui.mouseX < powerBoxX + powerBoxWidth)
-        if (ui.mouseY > powerBoxY && ui.mouseY < powerBoxY + powerBoxHeight){
-          uCtx.fillStyle = "rgb(230, 230, 230)";
-          uCtx.fillRect(powerBoxX, powerBoxY, powerBoxWidth, powerBoxHeight);
-
-          if (ui.click == true){
-            world.cyclePowerUps();
-          }
-        }
-    }
-
-    uCtx.fillStyle = "black";
-
-    uCtx.strokeStyle = 2;
-    uCtx.strokeRect(powerBoxX, powerBoxY, powerBoxWidth, powerBoxHeight);
-    uCtx.fillText(powertText, powertX, powertY);
-
-
-    // Powerups Label
 
     // Bullets Label
     uCtx.font = "40px Arial";
@@ -954,27 +861,11 @@ function UI(){
 
 
 
-    if (player.host == true){
-      // Randomize button
-      randomText = "Random";
-      randomX = backX;
-      randomY = backY + 50;
-      randomHeight = 40;
-      randomWidth = 100;
-      clicked = button(randomX, randomY, 100, randomHeight, randomText, 26, 20, false);
-
-      if (clicked == true){
-        world.randomizeSettings();
-      }
-
-    }
-
     if (player.host == true && Object.keys(world.players).length > 1){
-
       // Start game button
       startText = "Start";
       startX = backX;
-      startY = backY + 100;
+      startY = backY + 50;
       startHeight = 40;
       startWidth = 100;
       clicked = button(startX, startY, 100, startHeight, startText, 26, 20, false);
@@ -1088,87 +979,5 @@ function UI(){
       }
     }
   }
-
-  UI.prototype.devMenu = function(){
-    boxX = 0;
-    boxY = 100;
-    boxWidth = 100;
-    boxHeight = 400;
-
-    uCtx.fillStyle = "rgb(230, 230, 230)";
-    uCtx.fillRect(boxX, boxY, boxWidth, boxHeight);
-
-    uCtx.strokeStyle = "rgb(135, 135, 135)";
-    uCtx.strokeRect(boxX, boxY, boxWidth, boxHeight);
-
-    clicked = button(boxX + 5, boxY + 5, boxWidth - 10, 30, "Host", 20, 15, false);
-
-    if (clicked == true){
-      socket.emit('change host');
-    }
-
-    clicked = button(boxX + 5, boxY + 40, boxWidth - 10, 30, "Kick", 20, 15, false);
-
-    if (clicked == true){
-      username = prompt("Kick Who?");
-
-      for (var id in world.players) {
-        var user = world.players[id];
-
-        if (username == user.username){
-          socket.emit('kick', id);
-        }
-      }
-    }
-
-    clicked = button(boxX + 5, boxY + 75, boxWidth - 10, 30, "Health", 20, 15, false);
-
-    if (clicked == true){
-      player.health += (player.maxHealth / 4);
-    }
-
-    clicked = button(boxX + 5, boxY + 110, boxWidth - 10, 30, "Reload " + player.reloadTime, 20, 15, false);
-
-    if (clicked == true){
-      if (player.reloadTime == 18){
-        player.reloadTime = 0;
-      }else{
-        player.reloadTime = 18;
-      }
-    }
-
-    clicked = button(boxX + 5, boxY + 145, boxWidth - 10, 30, "Speed " + player.speedHack, 20, 15, false);
-
-    if (clicked == true){
-      if (player.speedHack == true){
-        player.speedHack = false;
-        player.speed = 3;
-      }else{
-        player.speedHack = true;
-      }
-    }
-
-    clicked = button(boxX + 5, boxY + 180, boxWidth - 10, 30, "TP", 20, 15, false);
-
-    if (clicked == true){
-      this.tpNextClick = true;
-    }
-
-    clicked = button(boxX + 5, boxY + 215, boxWidth - 10, 30, "Wall: " + world.wallHack, 20, 15, false);
-
-    if (clicked == true){
-      if (world.wallHack == true){
-        world.wallHack = false;
-      }else{
-        world.wallHack = true;
-      }
-    }
-
-    clicked = button(boxX + 5, boxY + boxHeight - 35, boxWidth - 10, 30, "Close", 20, 15, false);
-
-    if (clicked == true){
-      this.devMenuUp = false;
-    }
-
-  }
 }
+
