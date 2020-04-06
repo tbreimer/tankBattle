@@ -741,6 +741,8 @@ function Player(){
 
   Player.prototype.update = function(){
 
+    this.fire();
+
     if (this.type == 'playing'){
 
       // Freezes inputs when game starts
