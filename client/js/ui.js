@@ -160,10 +160,6 @@ function UI(){
           this.tabBar();
         }
 
-        if (this.gameStartScreenUp == true && player.type != 'spectator'){
-          this.gameStartScreen();
-        }
-
         break;
       case 2:
         this.pauseButton();
@@ -1173,71 +1169,6 @@ function UI(){
     if (clicked == true){
       this.devMenuUp = false;
     }
-
-  }
-
-  UI.prototype.gameStartScreen = function(){
-    boxWidth = windowWidth / 2;
-    boxHeight = windowHeight * 0.75;
-
-    this.gameStartFramesRemaining -= 1;
-
-    boxX = (windowWidth / 2) - (boxWidth / 2);
-    boxY = (windowHeight / 2) - (boxHeight / 2);
-
-    uCtx.globalAlpha = 0.80;
-
-    uCtx.fillStyle = "rgb(230, 230, 230)";
-    uCtx.fillRect(boxX, boxY, boxWidth, boxHeight);
-
-    uCtx.strokeStyle = "rgb(135, 135, 135)";
-    uCtx.strokeRect(boxX, boxY, boxWidth, boxHeight);
-
-    uCtx.font = "50px Arial";
-    uCtx.fillStyle = "black";
-    startText = "Game Starting...";
-    startWidth = uCtx.measureText(startText).width;
-    startX = (windowWidth / 2) - (startWidth / 2);
-    startY = boxY + 100;
-
-    uCtx.fillText(startText, startX, startY);
-
-    uCtx.font = "27px Arial";
-    uCtx.fillStyle = "black";
-    startText = "Health: " + player.maxHealth;
-    startWidth = uCtx.measureText(startText).width;
-    startX = (windowWidth / 2) - (startWidth / 2);
-    startY = boxY + 160;
-
-    uCtx.fillText(startText, startX, startY);
-
-    loadingWidth = (boxWidth - 100) * (this.gameStartFramesRemaining / 180);
-    loadingHeight = 35;
-    loadingX = windowWidth / 2 - loadingWidth / 2;
-    loadingY = boxY + boxHeight - 85;
-
-    uCtx.fillStyle = "DeepSkyBlue";
-    uCtx.fillRect(loadingX, loadingY, loadingWidth, loadingHeight);
-
-    uCtx.strokeStyle = "rgb(0, 141, 188)";
-    uCtx.strokeRect(loadingX, loadingY, loadingWidth, loadingHeight);
-
-    uCtx.globalAlpha = 1;
   }
 }
-/*
-
-
-
-    }else if (message == "$: map"){
-      mapID = prompt("Map ID");
-
-      world.changeMap(mapID);
-
-    }else if (message == "$: tp"){
-      x = prompt("X");
-      y = prompt("Y");
-
-      this.changePosition(x, y);
-    */
 

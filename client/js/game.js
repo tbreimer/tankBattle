@@ -655,19 +655,6 @@ function World(){
 
     socket.emit('change powerUp setting', newValue);
   }
-
-  World.prototype.startBeginPeriod = function(){
-    player.inputs = false;
-    ui.gameStartScreenUp = true;
-    ui.gameStartFramesRemaining = 180;
-
-    setTimeout(function(){ world.endBeginPeriod(); }, 3000);
-  }
-
-  World.prototype.endBeginPeriod = function(){
-    player.inputs = true;
-    ui.gameStartScreenUp = false;
-  }
 }
 
 function Player(){
@@ -1445,11 +1432,6 @@ socket.on('kill', function(value){
 socket.on('you won', function(value){
   player.wins += 1;
   player.gameWins += 1;
-});
-
-socket.on('game was started', function(){
-  world.startBeginPeriod();
-
 });
 
 function keyDown(evt){
