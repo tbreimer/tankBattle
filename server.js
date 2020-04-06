@@ -112,7 +112,7 @@ function Game(){
     }
 
     this.updateBullets();
-    this.updatePowerUps();
+    //this.updatePowerUps();
 
     frame += 1;
   }
